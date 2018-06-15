@@ -5,7 +5,7 @@
  */
 package com.hanoiTowers;
 
-import java.awt.BorderLayout;
+import java.awt.*;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -28,7 +28,6 @@ public class GUI extends javax.swing.JFrame {
         int velocidad = Integer.parseInt(campoVelocidad.getText());
         t = new tablero(torreInicio - 1, torreFinal - 1, torreAyuda - 1, velocidad, numeroDiscos, botonStart,campoTorreA,campoTorreB,campoTorreC,tabla);
         panelTablero.add(t, BorderLayout.CENTER);
-
         this.validate();
     }
     
@@ -65,31 +64,59 @@ public class GUI extends javax.swing.JFrame {
         campoTorreA = new javax.swing.JTextField();
         campoTorreB = new javax.swing.JTextField();
         campoTorreC = new javax.swing.JTextField();
-        jPanel2 = new javax.swing.JPanel();
         jSeparator1 = new javax.swing.JSeparator();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("LAS TORRES DE HANOI");
 
-        jPanel1.setBackground(new java.awt.Color(204, 204, 255));
+        jPanel1.setBackground(new java.awt.Color(34,34,34));
+        jPanel6.setBackground(new java.awt.Color(34,34,34));
+        jPanel4.setBackground(new java.awt.Color(34,34,34));
 
-        panelTablero.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        campoNumeroDiscos.setForeground(new java.awt.Color(255,255,255));
+        campoNumeroDiscos.setBackground(new java.awt.Color(89,89,89));
+
+        campoVelocidad.setForeground(new java.awt.Color(255,255,255));
+        campoVelocidad.setBackground(new java.awt.Color(89,89,89));
+
+        campoTorreA.setForeground(new java.awt.Color(255,255,255));
+        campoTorreA.setBackground(new java.awt.Color(89,89,89));
+
+        campoTorreB.setForeground(new java.awt.Color(255,255,255));
+        campoTorreB.setBackground(new java.awt.Color(89,89,89));
+
+        campoTorreC.setForeground(new java.awt.Color(255,255,255));
+        campoTorreC.setBackground(new java.awt.Color(89,89,89));
+
+        jPanel1.setBackground(new java.awt.Color(34, 34, 34));
+
+        panelTablero.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(34, 34, 34)));
         panelTablero.setMinimumSize(new java.awt.Dimension(2, 2));
         panelTablero.setLayout(new java.awt.BorderLayout());
+        panelTablero.setBackground(new java.awt.Color(34,34,34));
+
+        tabla.setBackground(new java.awt.Color(34,34,34));
+        tabla.setForeground(new java.awt.Color(255,255,255));
 
         jPanel5.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jPanel5.setBackground(new java.awt.Color(34,34,34));
 
         jLabel3.setFont(new java.awt.Font("Verdana", 1, 14));
         jLabel3.setText("Settings:");
-        jLabel3.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jLabel3.setForeground(new java.awt.Color(255,255,255));
+        jLabel3.setBackground(new java.awt.Color(34,34,34));
 
         jLabel4.setFont(new java.awt.Font("Calibri", 0, 14));
         jLabel4.setText("Discs:");
+        jLabel4.setForeground(new java.awt.Color(255,255,255));
 
         jLabel7.setFont(new java.awt.Font("Calibri", 0, 14));
         jLabel7.setText("Speed:");
+        jLabel7.setForeground(new java.awt.Color(255,255,255));
 
         botonStart.setText("Start");
+        botonStart.setForeground(new java.awt.Color(255,255,255));
+        botonStart.setBackground(new java.awt.Color(89,89,89));
         botonStart.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 botonStartActionPerformed(evt);
@@ -97,6 +124,8 @@ public class GUI extends javax.swing.JFrame {
         });
 
         botonReset.setText("Reset");
+        botonReset.setBackground(new java.awt.Color(89,89,89));
+        botonReset.setForeground(new java.awt.Color(255,255,255));
         botonReset.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 botonResetActionPerformed(evt);
@@ -104,6 +133,8 @@ public class GUI extends javax.swing.JFrame {
         });
 
         botonPausa.setText("Stop");
+        botonPausa.setBackground(new java.awt.Color(89,89,89));
+        botonPausa.setForeground(new java.awt.Color(255,255,255));
         botonPausa.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 botonPausaActionPerformed(evt);
@@ -199,20 +230,26 @@ public class GUI extends javax.swing.JFrame {
             }
         });
         jScrollPane1.setViewportView(tabla);
-
+        jScrollPane1.setBackground(new java.awt.Color(34,34,34));
+        ;
         jLabel8.setFont(new java.awt.Font("Verdana", 1, 14));
         jLabel8.setText("Executed Movements:");
-        jLabel8.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jLabel8.setForeground(new Color(255,255,255));
 
         jLabel9.setText("Tower 1:");
+        jLabel9.setForeground(new Color(255,255,255));
 
         jLabel10.setText("Tower 2:");
+        jLabel10.setForeground(new Color(255,255,255));
+
 
         jLabel11.setText("Tower 3:");
+        jLabel11.setForeground(new Color(255,255,255));
 
         jLabel12.setFont(new java.awt.Font("Verdana", 1, 14));
         jLabel12.setText("Towers Movements:");
-        jLabel12.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jLabel12.setForeground(new Color(255,255,255));
+
 
         campoTorreA.setEditable(false);
         campoTorreA.setText("0");
@@ -311,11 +348,6 @@ public class GUI extends javax.swing.JFrame {
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
-        jPanel2.setPreferredSize(new java.awt.Dimension(100, 35));
-        jPanel2.setLayout(new java.awt.BorderLayout());
-        jPanel2.add(jSeparator1, java.awt.BorderLayout.PAGE_START);
-
-        getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_END);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -381,7 +413,6 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;

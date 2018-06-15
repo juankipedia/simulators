@@ -29,13 +29,7 @@ public class tablero extends JPanel implements Runnable {
     private JTable tabla;
     
     private int contadorMovimientos;
-    /**
-     * Constructor que inicializa todos los paramentros para empesar a trabajar
-     * @param torreInicio Es donde empesaran los discos
-     * @param torreFin Es donde deven de terminar los discos
-     * @param torreAyuda Este es el poste que se usara como ayuda para pasar los discos
-     * @param velocidad Es la velocidad con la que se desarrollara el juego
-     */
+
     public tablero(int torreInicio, int torreFin, int torreAyuda, int velocidad, int numeroDiscos,JButton botonStart,JTextField campoTorreA,JTextField campoTorreB,JTextField campoTorreC,JTable tabla) {
         this.torreInicio = torreInicio;
         this.torreFin = torreFin;
@@ -61,8 +55,9 @@ public class tablero extends JPanel implements Runnable {
     public void paint(Graphics g) {
         Image i = createImage(this.getSize().width,this.getSize().height);
         Graphics gra = i.getGraphics();
-        //Obtenemos las nuevas dimenciones de la pantalla para calcular el la nuevas dimenciones de las
-        //Torres ya que las torren creson con respecto a la pantalla
+        gra.setColor(new Color(34,34,34));
+        gra.fill3DRect(0,0, this.getSize().width,this.getSize().height, true);
+
         torres[0].setPosicionX(this.getSize().width / 4);
         torres[0].setPosicionY(10);
         torres[0].setPosicionXFinal(6);
@@ -79,7 +74,7 @@ public class tablero extends JPanel implements Runnable {
         torres[2].setPosicionYFinal(this.getSize().height - 20);
 
         //Se dibujan en el panel las 3 torres
-        gra.setColor(Color.red);
+        gra.setColor(Color.blue);
         gra.fill3DRect(torres[0].getPosicionX(), torres[0].getPosicionY(), torres[0].getPosicionXFinal(), torres[0].getPosicionYFinal(), true);
         gra.fill3DRect(torres[1].getPosicionX(), torres[1].getPosicionY(), torres[1].getPosicionXFinal(), torres[1].getPosicionYFinal(), true);
         gra.fill3DRect(torres[2].getPosicionX(), torres[2].getPosicionY(), torres[2].getPosicionXFinal(), torres[2].getPosicionYFinal(), true);
@@ -102,7 +97,7 @@ public class tablero extends JPanel implements Runnable {
                 int posicionY = (this.getSize().height-10)-(10*totalDiscos);//posicion en y inicial del disco
                 int posicionXFinal = disco.getSize();                       //posicion en x final del disco
                 int posicionYFinal = 10;                                    //posicion en y final del disco
-                gra.setColor(Color.cyan);
+                gra.setColor(Color.yellow);
                 gra.fill3DRect(posicionX, posicionY, posicionXFinal, posicionYFinal, true);
                 totalDiscos--;
             }      
