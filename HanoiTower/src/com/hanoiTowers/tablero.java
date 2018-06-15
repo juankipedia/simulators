@@ -120,18 +120,11 @@ public class tablero extends JPanel implements Runnable {
             return;
         }
         pasar(torreInicio, torreFin, torreAyuda, numeroDiscos);
-        generarFichero generarF = new generarFichero();
-        generarF.generarFichero(tabla,Integer.parseInt(campoTorreA.getText()),Integer.parseInt(campoTorreB.getText()),Integer.parseInt(campoTorreC.getText()));
+        buildDataFile generarF = new buildDataFile();
+        generarF.buildDataFile(tabla,Integer.parseInt(campoTorreA.getText()),Integer.parseInt(campoTorreB.getText()),Integer.parseInt(campoTorreC.getText()));
         botonStart.setEnabled(true);
     }
-    
-    /**
-     * Metodo encargado de pasar los discos de un palo a otro
-     * @param inicio Incio, Es donde empesaran los discos
-     * @param fin Fin, Es donde tienen que terminar los discos
-     * @param k Ayuda, Es el palo que usamos de ayuda para pasar los discos
-     * @param l Discos, Es el numero de discos
-     */
+
     public void pasar(int inicio, int fin, int ayuda, int numeroDiscos) {
         if (numeroDiscos == 1) {
             pasar(inicio, fin);
@@ -144,12 +137,6 @@ public class tablero extends JPanel implements Runnable {
         }
     }
 
-    /**
-     * Metodo encargado de pasar un solo disco desde su posicion inicial a la posicion
-     * en la que se quieren los discos
-     * @param inicio es la torre desde la cual se retirara el disco
-     * @param fin es la torre a la cual llegar el disco rretirado de inicio
-     */
     public void pasar(int inicio, int fin) {
         //Incrementamos el numero de movimientos
         contadorMovimientos++;

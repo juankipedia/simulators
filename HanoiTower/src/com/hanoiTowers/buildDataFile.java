@@ -7,13 +7,13 @@ import java.io.FileWriter;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 
-public class generarFichero {
+public class buildDataFile {
 
     File f;
-    FileWriter ficheroEscritura;
-    BufferedWriter escribir;
+    FileWriter w;
+    BufferedWriter writing;
 
-    public generarFichero() {
+    public buildDataFile() {
         f = new File("./data.txt");
         if (!f.exists()) {
             try {
@@ -26,32 +26,31 @@ public class generarFichero {
 
 
         try {
-            ficheroEscritura = new FileWriter(f, false);
-            escribir = new BufferedWriter(ficheroEscritura);
+            w = new FileWriter(f, false);
+            writing = new BufferedWriter(w);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Err:loading");
             return;
         }
     }
 
-    public void generarFichero(JTable tabla,int totalTorreA,int totalTorreB,int totalTorreC) {
-        int totalFilas = tabla.getRowCount();
-        int totalColumnas = 4;
+    public void buildDataFile(JTable table, int tTowerA, int tTowerB, int tTowerC) {
+        int tRows = table.getRowCount();
         int i=0;
 
         try {
-            escribir.write("\tData");
-            escribir.newLine();
-            escribir.newLine();
+            writing.write("\tData");
+            writing.newLine();
+            writing.newLine();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null,"Err: writing" );
         }
         
 
-        for (int c = 0; c < totalFilas; c++) {
+        for (int c = 0; c < tRows; c++) {
             try {
-                escribir.write("Movement:"+(Integer)tabla.getValueAt(c, i++) + "  |  Disc:"+(Integer)tabla.getValueAt(c, i++)+"  |  From: "+(Integer)tabla.getValueAt(c, i++)+"  |  To: "+(Integer)tabla.getValueAt(c, i++));
-                escribir.newLine();
+                writing.write("Movement:"+(Integer)table.getValueAt(c, i++) + "  |  Disc:"+(Integer)table.getValueAt(c, i++)+"  |  From: "+(Integer)table.getValueAt(c, i++)+"  |  To: "+(Integer)table.getValueAt(c, i++));
+                writing.newLine();
                 i=0;
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(null, "Err: writing line"+e);
@@ -61,18 +60,18 @@ public class generarFichero {
         
 
         try {
-            escribir.newLine();
-            escribir.newLine();
-            escribir.newLine();
-            escribir.write("\t\tMovements:"+(totalTorreA+totalTorreB+totalTorreC));
-            escribir.newLine();
+            writing.newLine();
+            writing.newLine();
+            writing.newLine();
+            writing.write("\t\tMovements:"+(tTowerA + tTowerB + tTowerC));
+            writing.newLine();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null,"Err: writing" );
         }
         
         try {
-            escribir.close();
-            ficheroEscritura.close();            
+            writing.close();
+            w.close();
         } catch (Exception e) {}
 
         Desktop d = Desktop.getDesktop();
@@ -83,6 +82,6 @@ public class generarFichero {
     }
 
     public static void main(String[] args) {
-        new generarFichero();
+        new buildDataFile();
     }
 }
