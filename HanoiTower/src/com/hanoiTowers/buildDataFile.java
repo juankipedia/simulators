@@ -49,7 +49,7 @@ public class buildDataFile {
 
         for (int c = 0; c < tRows; c++) {
             try {
-                writing.write("Movement:"+(Integer)table.getValueAt(c, i++) + "  |  Disc:"+(Integer)table.getValueAt(c, i++)+"  |  From: "+(Integer)table.getValueAt(c, i++)+"  |  To: "+(Integer)table.getValueAt(c, i++));
+                writing.write("Movement:"+(Integer)table.getValueAt(c, i++) + "    Disc:"+(Integer)table.getValueAt(c, i++)+"    From: "+(Integer)table.getValueAt(c, i++)+"    To: "+(Integer)table.getValueAt(c, i++));
                 writing.newLine();
                 i=0;
             } catch (Exception e) {
