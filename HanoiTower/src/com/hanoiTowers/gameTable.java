@@ -21,8 +21,7 @@ public class gameTable extends JPanel implements Runnable {
     private Tower[] towers;
 
     private JButton startButton;
-    
-    //Campos con el contador de movimientos
+
     private JTextField fieldTowerA;
     private JTextField fieldTowerB;
     private JTextField fieldTowerC;
@@ -36,14 +35,12 @@ public class gameTable extends JPanel implements Runnable {
         this.auxTower = auxTower;
         this.speed = speed;
         this.towerSize = towerSize;
-        
-        //Iniciliso las 3 towers
+
         this.towers = new Tower[3];
         towers[0] = new Tower();
         towers[1] = new Tower();
         towers[2] = new Tower();
         
-        //Creamos una referencia a sia los campo del formulario para poderlos actualizar
         this.startButton = startButton;
         this.fieldTowerA = fieldTowerA;
         this.fieldTowerB = fieldTowerB;
@@ -73,30 +70,25 @@ public class gameTable extends JPanel implements Runnable {
         towers[2].setXposFinal(6);
         towers[2].setYposFinal(this.getSize().height - 20);
 
-        //Se dibujan en el panel las 3 towers
         gra.setColor(Color.blue);
         gra.fill3DRect(towers[0].getXpos(), towers[0].getYpos(), towers[0].getXposFinal(), towers[0].getYposFinal(), true);
         gra.fill3DRect(towers[1].getXpos(), towers[1].getYpos(), towers[1].getXposFinal(), towers[1].getYposFinal(), true);
         gra.fill3DRect(towers[2].getXpos(), towers[2].getYpos(), towers[2].getXposFinal(), towers[2].getYposFinal(), true);
 
-        //Una ves impresos las towers devemos imprimir los discos
         for (int c = 0; c < towers.length; c++) {
-            //Obtenemos las towers del vector de las towers
             Tower tower = towers[c];
-            
-            //Obtenemos la pila con los discos que contiene la tower
+
             Stack<Tower.Disc> pila = tower.cloneDiscsStack();
-            
-            //Recuperamos el numeros que tiene actualmente la tower
+
             int totalDiscos = pila.size();
             
-            //Imprimimos los discos
+
             for (; !pila.isEmpty() ;) {
                 Tower.Disc disc = pila.pop();
-                int posicionX = (tower.getXpos()+3)-(disc.getSize()/2);//posicion en x inicial del disc
-                int posicionY = (this.getSize().height-10)-(10*totalDiscos);//posicion en y inicial del disc
-                int posicionXFinal = disc.getSize();                       //posicion en x final del disc
-                int posicionYFinal = 10;                                    //posicion en y final del disc
+                int posicionX = (tower.getXpos()+3)-(disc.getSize()/2);
+                int posicionY = (this.getSize().height-10)-(10*totalDiscos);
+                int posicionXFinal = disc.getSize();
+                int posicionYFinal = 10;
                 gra.setColor(Color.yellow);
                 gra.fill3DRect(posicionX, posicionY, posicionXFinal, posicionYFinal, true);
                 totalDiscos--;

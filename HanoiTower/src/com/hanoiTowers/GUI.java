@@ -379,7 +379,6 @@ public class GUI extends javax.swing.JFrame {
     }//GEN-LAST:event_botonResetActionPerformed
 
     private void botonPausaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonPausaActionPerformed
-        // TODO add your handling code here:
         if (gameThread.isAlive()) {
             gameThread.stop();
         }
