@@ -13,3 +13,5 @@ is going to run.
 On src directory you will find com.hanoiTowers where the core of simulator is located.
 To run this simulator, import it on your favorite IDE just like a normal java project and
 run Main class.
+
+[Youtube simulation](https://www.youtube.com/watch?v=cwkwVqBuprk)
