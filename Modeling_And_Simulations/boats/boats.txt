@@ -1,0 +1,9 @@
+The boats arrive at a port with times between arrival exponentials with an average of 1.25 days. 
+The port has a pier with two berths and two cranes to download the boats. The ships that arrive 
+when both berths are busy join a FIFO queue. The time for a crane to unload a ship is distribute 
+as a uniform between 0.5 and 1.5 days. If only one boat is at the berth, both Cranes unload the 
+boat and the time is reduced by half. When two boats are in the Berth, each crane will take care 
+of a different boat. If both cranes are downloading a ship and a second ship arrives at the berth 
+one of the cranes begins to serve to this ship and the time remaining to the first ship is doubled. 
+Run the simulation for 90 days. You want to calculate the average wait time of a ship to be served 
+and the time maximum as well as the minimum, average and maximum discharge time.
