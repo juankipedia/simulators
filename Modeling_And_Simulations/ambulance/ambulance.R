@@ -10,7 +10,7 @@ library(parallel)
 
 for (v in 1:3) {
   seeds <- c(1541, 1625, 1365, 1785, 1521, 1451, 1121, 1681, 1781, 1411, 1321, 1544, 1521, 1235, 1327,1000)
-  AMBULANCE_NUMBER <- 7 + v
+  AMBULANCE_NUMBER <- 6 + v
   result <- mclapply(seeds, function(the_seed) {
     set.seed(the_seed)
     
@@ -167,6 +167,7 @@ result
 table_result <- matrix(result,ncol=3,byrow=TRUE) 
 print(paste("Mean waiting time: ", mean(table_result[, 1]), " Mean percetage of calls that must wait: ", mean(table_result[, 2]) * 100, 
             " Mean activity time: ", mean(table_result[, 3]) * 100))
+result_arr <- c(AMBULANCE_NUMBER, mean(table_result[, 1]), mean(table_result[, 2]) * 100, mean(table_result[, 3]) * 100)
 
 AMBULANCE_NUMBER <- 2
 seeds <- c(1541, 1625, 1365, 1785, 1521, 1451, 1121, 1681, 1781, 1411, 1321, 1544, 1521, 1235, 1327,1000)
@@ -217,6 +218,7 @@ result
 table_result <- matrix(result,ncol=3,byrow=TRUE) 
 print(paste("Mean waiting time: ", mean(table_result[, 1]), " Mean percetage of calls that must wait: ", mean(table_result[, 2]) * 100, 
             " Mean activity time: ", mean(table_result[, 3]) * 100))
+result_arr <- c(result_arr, c(AMBULANCE_NUMBER, mean(table_result[, 1]), mean(table_result[, 2]) * 100, mean(table_result[, 3]) * 100))
 
 AMBULANCE_NUMBER <- 3
 seeds <- c(1541, 1625, 1365, 1785, 1521, 1451, 1121, 1681, 1781, 1411, 1321, 1544, 1521, 1235, 1327,1000)
@@ -268,6 +270,8 @@ table_result <- matrix(result,ncol=3,byrow=TRUE)
 print(paste("Mean waiting time: ", mean(table_result[, 1]), " Mean percetage of calls that must wait: ", mean(table_result[, 2]) * 100, 
             " Mean activity time: ", mean(table_result[, 3]) * 100))
 
+result_arr <- c(result_arr, c(AMBULANCE_NUMBER, mean(table_result[, 1]), mean(table_result[, 2]) * 100, mean(table_result[, 3]) * 100))
+
 AMBULANCE_NUMBER <- 4
 seeds <- c(1541, 1625, 1365, 1785, 1521, 1451, 1121, 1681, 1781, 1411, 1321, 1544, 1521, 1235, 1327,1000)
 result <- mclapply(seeds, function(the_seed) {
@@ -318,3 +322,21 @@ table_result <- matrix(result,ncol=3,byrow=TRUE)
 print(paste("Mean waiting time: ", mean(table_result[, 1]), " Mean percetage of calls that must wait: ", mean(table_result[, 2]) * 100, 
             " Mean activity time: ", mean(table_result[, 3]) * 100))
 
+result_arr <- c(result_arr, c(AMBULANCE_NUMBER, mean(table_result[, 1]), mean(table_result[, 2]) * 100, mean(table_result[, 3]) * 100))
+table_result <- matrix(result_arr,ncol=4,byrow=TRUE)
+table_result
+colnames(table_result) <- c("Ambulance Number", "Mean waiting time", "Mean percetage of calls that must wait", "Mean activity time")
+table_result <- as.data.frame.matrix(table_result)
+range <- c(paste("[ ",toString(min(table_result$"Ambulance Number"))," , ",toString(max(table_result$"Ambulance Number"))," ]"),
+           paste("[ ",toString(min(table_result$"Mean waiting time"))," , ",toString(max(table_result$"Mean waiting time"))," ]"),
+           paste("[ ",toString(min(table_result$"Mean percetage of calls that must wait"))," , ",toString(max(table_result$"Mean percetage of calls that must wait"))," ]"),
+           paste("[ ",toString(min(table_result$"Mean activity time"))," , ",toString(max(table_result$"Mean activity time"))," ]"))
+
+sd <- c(sd(table_result$"Ambulance Number"), 
+        sd(table_result$"Mean waiting time"), 
+        sd(table_result$"Mean percetage of calls that must wait"), 
+        sd(table_result$"Mean activity time"))
+table_result <- rbind(table_result, range)
+table_result <- rbind(table_result, sd)
+rownames(table_result) <- c("1", "2", "3", "4", "range", "standard deviation")
+table_result
