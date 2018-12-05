@@ -2,12 +2,17 @@ library(simmer)
 library(magrittr)
 library(parallel)
 
+# 16 runs of pier exercise.
+
 seeds <- c(393943, 100005, 777999555, 319999772, 4544, 55454, 5468, 6554, 7945, 545121, 7455, 554, 78955, 232554, 58515, 54955)
 result <- mclapply(seeds, function(the_seed) {
 set.seed(the_seed)
   
 pier <- simmer() %>%
   add_resource("crane", 2)
+
+# Create Trajeectory Boat with 3 subtrajectories, one when there are not boats on servers, 
+# another when there are only one and a third one when both servers are busy
 
 boat <- trajectory() %>%
   branch(option = function() get_server_count(pier, "crane") + 1, continue = c(T, T, T),
@@ -68,6 +73,8 @@ colnames(table_result) <- c("Number of Boats     ",
                             "Maximum download time     ", "Minimum download time     ")
 rownames(table_result) <- c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16")
 table_result <- as.table(table_result)
+
+# Table of results.
 table_result
 
 

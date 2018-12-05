@@ -1,0 +1,14 @@
+In a large metropolitan area, an emergency care center receives requests and
+Dispatch ambulances at a rate of 1 every 15 ± 10 minutes. Approximately 15% of the
+Requests are false alarms that take 12 ± 2 minutes to be processed. The remaining
+Applications can be of two types: Tomb cases (15% of non-false calls) that take
+approximately 25 ± 5 minutes and normal calls that take 20 ± 10 processed minutes 
+Assume that there is a very large number of ambulances and that all They can be 
+available when necessary. Simulate the system for 500 calls.
+a) Estimate the number of ambulances required to cover 100% of the required service.
+b) Suppose there is only one ambulance available. Any call that occurs while a
+ambulance is in service should wait. Can a single ambulance provide the service
+required?
+c) Simulate the system with x ambulances, where x = 1,2,3 or 4. Compare the alternatives in
+The terms of time a call must wait, the percentage of calls that must wait, the percentage of
+time that ambulances are busy.

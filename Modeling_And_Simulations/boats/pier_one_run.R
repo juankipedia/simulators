@@ -2,6 +2,8 @@ library(simmer)
 library(magrittr)
 library(parallel)
 
+# example for only one run of pier exercise.
+
 set.seed(132432)
 pier <- simmer() %>%
         add_resource("crane", 2)
