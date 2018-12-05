@@ -67,18 +67,29 @@ c(sum(table$finished), mean(table$waiting_time), max(table$waiting_time), min(ta
 }) %>% unlist()
 result
 table_result <- matrix(result,ncol=7,byrow=TRUE)
-colnames(table_result) <- c("Number of Boats     ", 
-                            "Mean waiting time     ", "Maximum waiting time     ", 
-                            "Minimum waiting time     ", "Mean download time     ", 
-                            "Maximum download time     ", "Minimum download time     ")
-rownames(table_result) <- c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16")
+colnames(table_result) <- c("Number of Boats", 
+                            "Mean waiting time", "Maximum waiting time", 
+                            "Minimum waiting time", "Mean download time", 
+                            "Maximum download time", "Minimum download time")
 table_result <- as.table(table_result)
 
 # Table of results.
-table_result
+table_result <- as.data.frame.matrix(table_result)
+range <- c(paste("[ ",toString(min(table_result$"Number of Boats"))," , ",toString(max(table_result$"Number of Boats"))," ]"),
+                                      paste("[ ",toString(min(table_result$"Mean waiting time"))," , ",toString(max(table_result$"Mean waiting time"))," ]"),
+                                      paste("[ ",toString(min(table_result$"Maximum waiting time"))," , ",toString(max(table_result$"Maximum waiting time"))," ]"),
+                                      paste("[ ",toString(min(table_result$"Minimum waiting time"))," , ",toString(max(table_result$"Minimum waiting time"))," ]"),
+                                      paste("[ ",toString(min(table_result$"Mean download time"))," , ",toString(max(table_result$"Mean download time"))," ]"),
+                                      paste("[ ",toString(min(table_result$"Maximum download time"))," , ",toString(max(table_result$"Maximum download time"))," ]"),
+                                      paste("[ ",toString(min(table_result$"Minimum download time"))," , ",toString(max(table_result$"Minimum download time"))," ]"))
 
-
-
-
-
-
+sd <- c(sd(table_result$"Number of Boats"), 
+                                      sd(table_result$"Mean waiting time"), 
+                                      sd(table_result$"Maximum waiting time"), 
+                                      sd(table_result$"Minimum waiting time"), 
+                                      sd(table_result$"Mean download time"), 
+                                      sd(table_result$"Maximum download time"), 
+                                      sd(table_result$"Minimum download time"))
+table_result <- rbind(table_result, range)
+table_result <- rbind(table_result, sd)
+rownames(table_result) <- c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "range", "standard deviation")
