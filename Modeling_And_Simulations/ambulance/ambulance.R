@@ -9,7 +9,7 @@ library(parallel)
 # First run for 7, 8 and 9 ambulances and compare results for how many runs ended with not waiting time.
 
 for (v in 1:3) {
-  seeds <- c(1541, 1625, 1365, 1785, 1521, 1451, 1121, 1681, 1781, 1411, 1321, 1544, 1521, 1235, 1327,1000)
+  seeds <- c(15541, 1625, 1544365, 17854, 145521, 1451, 115421, 145681, 174581, 14151, 135421, 1575744, 152571, 12355, 132757,100550)
   AMBULANCE_NUMBER <- 6 + v
   result <- mclapply(seeds, function(the_seed) {
     set.seed(the_seed)
@@ -43,8 +43,8 @@ for (v in 1:3) {
       simmer("hospital") %>%
       add_resource("ambulance", AMBULANCE_NUMBER) %>%
       add_generator("call_1", call_1, function() {c(0, runif(74, 5, 25), -1)}) %>%
-      add_generator("call_2", call_2, function() {c(runif(63, 5, 25), -1)}) %>%
-      add_generator("call_3", call_3, function() {c(runif(362, 5, 25), -1)})
+      add_generator("call_2", call_2, function() {c(runif(64, 5, 25), -1)}) %>%
+      add_generator("call_3", call_3, function() {c(runif(361, 5, 25), -1)})
     
     hospital %>% run(until = 100000000000)
     table <-
@@ -98,8 +98,8 @@ result <- mclapply(seeds, function(the_seed) {
     simmer("hospital") %>%
     add_resource("ambulance", AMBULANCE_NUMBER) %>%
     add_generator("call_1", call_1, function() {c(0, runif(74, 5, 25), -1)}) %>%
-    add_generator("call_2", call_2, function() {c(runif(63, 5, 25), -1)}) %>%
-    add_generator("call_3", call_3, function() {c(runif(362, 5, 25), -1)})
+    add_generator("call_2", call_2, function() {c(runif(64, 5, 25), -1)}) %>%
+    add_generator("call_3", call_3, function() {c(runif(361, 5, 25), -1)})
   
   hospital %>% run(until = 100000000000)
   table <-
@@ -152,8 +152,8 @@ result <- mclapply(seeds, function(the_seed) {
     simmer("hospital") %>%
     add_resource("ambulance", AMBULANCE_NUMBER) %>%
     add_generator("call_1", call_1, function() {c(0, runif(74, 5, 25), -1)}) %>%
-    add_generator("call_2", call_2, function() {c(runif(63, 5, 25), -1)}) %>%
-    add_generator("call_3", call_3, function() {c(runif(362, 5, 25), -1)})
+    add_generator("call_2", call_2, function() {c(runif(64, 5, 25), -1)}) %>%
+    add_generator("call_3", call_3, function() {c(runif(361, 5, 25), -1)})
   
   hospital %>% run(until = 100000000000)
   table <-
@@ -203,8 +203,8 @@ result <- mclapply(seeds, function(the_seed) {
     simmer("hospital") %>%
     add_resource("ambulance", AMBULANCE_NUMBER) %>%
     add_generator("call_1", call_1, function() {c(0, runif(74, 5, 25), -1)}) %>%
-    add_generator("call_2", call_2, function() {c(runif(63, 5, 25), -1)}) %>%
-    add_generator("call_3", call_3, function() {c(runif(362, 5, 25), -1)})
+    add_generator("call_2", call_2, function() {c(runif(64, 5, 25), -1)}) %>%
+    add_generator("call_3", call_3, function() {c(runif(361, 5, 25), -1)})
   
   hospital %>% run(until = 100000000000)
   table <-
@@ -254,8 +254,8 @@ result <- mclapply(seeds, function(the_seed) {
     simmer("hospital") %>%
     add_resource("ambulance", AMBULANCE_NUMBER) %>%
     add_generator("call_1", call_1, function() {c(0, runif(74, 5, 25), -1)}) %>%
-    add_generator("call_2", call_2, function() {c(runif(63, 5, 25), -1)}) %>%
-    add_generator("call_3", call_3, function() {c(runif(362, 5, 25), -1)})
+    add_generator("call_2", call_2, function() {c(runif(64, 5, 25), -1)}) %>%
+    add_generator("call_3", call_3, function() {c(runif(361, 5, 25), -1)})
   
   hospital %>% run(until = 100000000000)
   table <-
@@ -306,8 +306,8 @@ result <- mclapply(seeds, function(the_seed) {
     simmer("hospital") %>%
     add_resource("ambulance", AMBULANCE_NUMBER) %>%
     add_generator("call_1", call_1, function() {c(0, runif(74, 5, 25), -1)}) %>%
-    add_generator("call_2", call_2, function() {c(runif(63, 5, 25), -1)}) %>%
-    add_generator("call_3", call_3, function() {c(runif(362, 5, 25), -1)})
+    add_generator("call_2", call_2, function() {c(runif(64, 5, 25), -1)}) %>%
+    add_generator("call_3", call_3, function() {c(runif(361, 5, 25), -1)})
   
   hospital %>% run(until = 100000000000)
   table <-

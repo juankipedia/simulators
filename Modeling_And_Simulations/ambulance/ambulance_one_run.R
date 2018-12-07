@@ -35,8 +35,8 @@ hospital <-
   simmer("hospital") %>%
   add_resource("ambulance", AMBULANCE_NUMBER) %>%
   add_generator("call_1", call_1, function() {c(0, runif(74, 5, 25), -1)}) %>%
-  add_generator("call_2", call_2, function() {c(runif(63, 5, 25), -1)}) %>%
-  add_generator("call_3", call_3, function() {c(runif(362, 5, 25), -1)})
+  add_generator("call_2", call_2, function() {c(runif(64, 5, 25), -1)}) %>%
+  add_generator("call_3", call_3, function() {c(runif(361, 5, 25), -1)})
 
 hospital %>% run(until = 100000000000)
 table <-
