@@ -1,0 +1,125 @@
+---
+title: 'Modelización de datos de entrada'
+author: "Juan Diego M. Flores"
+date: "16 de enero de 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(e1071)
+```
+## Enunciado
+
+Determinar la distribución de la cantidad de precipitación 
+diaria en una localidad geográfica. Como los patrones climáticos varian mes a mes,
+los diferentes meses pueden tener diferentes distribuciones de probabilidad.
+En particular, los datos de este ejercicio corresponden a la localidad de Gavidia,
+en el páramo merideño durante los años 2000 a 2004. Los datos ya han sido procesados
+y se encuentren en un data frame con dos columnas M (mes) y P (precipitación).
+
+### Carga de Datos
+
+```{r carga de datos}
+datos <-load("PreMensual.RData")
+```
+
+Trabajaremos con los datos del mes de Mayo(5), por lo tanto seleccionamos dicho mes.
+
+```{r}
+mayo_d <- byMonth %>%
+    filter(M==5)
+head(mayo_d)
+
+```
+
+Aislamos solo la variable de precipitacion y obtenemos:
+
+```{r}
+mayo <- mayo_d$P
+mayo
+```
+
+### Verificación de la independencia de los datos
+
+```{r}
+acf(mayo)
+```
+
+De acuerdo a este gráfico se logro ver que no se muestra correlacion significativa para los retardos, esto representa
+un fuerte indicio de que las observaciones son independientes entre sí. Es decir los datos no parecen estar correlacionados serialmente.
+
+###  Formulación de una distribución probable
+
+#####  Histograma de Probabilidad
+
+El histograma nos dará un idea de la forma de la distribución.
+
+```{r hipotesis 1}
+hist(mayo,prob=T)
+```
+
+De acuerdo con el histograma presentado, notamos que los datos parecen seguir la forma de una distribución Exponencial, sin embargo utilizaremos las estadísticas sobre los datos ya que algunas distribuciones se caracterizan al menos parcialmente por funciones de sus parámetros 
+
+##### Resumen de estadísticas
+```{r hipotesis 2}
+summary(mayo)
+```
+
+##### Varianza
+```{r hipotesis 3}
+var(mayo)
+```
+
+##### Coeficiente de variación
+```{r hipotesis 4}
+cvar = sd(mayo)/mean(mayo)
+cvar
+```
+
+##### Sesgo
+```{r hipotesis 5}
+skewness(mayo)
+```
+
+Tanto el Coeficiente de variación (cv ~ 1) y el sesgo (v > 0) siguen la hipótesis formulada a partir de la forma del histograma, los datos parecen seguir una distribución Exponencial. 
+
+
+### Cálculo de los parámetros para la distribución candidata.
+
+Calculamos el parámetro para la distribucion candidata: Exponencial.
+```{r}
+library(MASS)
+lambda =fitdistr(mayo,"exponential")
+lambda
+```
+
+### Comparación Gráfica
+
+Comparemos graficamente la función de probabilidad acumulada de la distribución con la función de probabilidad empírica de los datos:
+
+### Indicaciones:
+
+1. Algunas referencias interesantes para este tema y el proyecto
+
+  + Gráfico con las distribuciones de probabilidad y sus relaciones https://www.johndcook.com/blog/distribution_chart/
+  
+  + Grafico de selección de las distribuciones: 
+  ![](seleccionDistribuciones.png)
+  
+Fuente: http://people.stern.nyu.edu/adamodar/pdfiles/papers/probabilistic.pdf
+
+2. Distribuciones comunes para modelizar datos de precipitacion son:
+
+  + La exponencial
+
+  + La Gamma
+
+  + La Weibull
+
+  + La Logonormal
+
+Asi que estas deben ser sus principales "sospechosas".
+
+ 
