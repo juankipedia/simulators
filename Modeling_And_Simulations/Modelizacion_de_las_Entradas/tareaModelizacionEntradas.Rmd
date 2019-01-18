@@ -43,12 +43,41 @@ mayo
 
 ### Verificación de la independencia de los datos
 
+##### Gráfico de Autocorrelación:
+
+La primera técnica y la más explicita es el gráfico de autocorrelación
 ```{r}
 acf(mayo)
 ```
 
 De acuerdo a este gráfico se logro ver que no se muestra correlacion significativa para los retardos, esto representa
 un fuerte indicio de que las observaciones son independientes entre sí. Es decir los datos no parecen estar correlacionados serialmente.
+Sin embargo veremos que nos dicen las demas técnicas disponibles
+
+##### Gráfico de las observaciones a lo largo del tiempo
+
+Otra técnica es graficar las observaciones a lo largo del tiempo, esto nos Mostrará si las observaciones muestran tendencias obvias.
+
+```{r autocor2}
+ts.plot(mayo)
+```
+
+El gráfico a lo largo del tiempo no parece mostrar tendencias obvias otro claro indicio de que los datos son independientes.
+
+##### Gráficos de Dispersión
+
+la Última técnica a utilizar serán los gráficos de dispersión para observar las formas descritas por las observaciones, en este caso lo realizamos para 4 separaciones.
+
+```{r}
+lag.plot(mayo,lags=4,layout=c(2,2),labels=F,do.lines=F)
+```
+
+De nuevo y en concordancia con las gráficas anteriores no vemos correlación en los datos.
+
+###### Análisis 
+
+De acuerdo con las gráficas anteriores y en especial con el gráfico de correlación se concluye que los datos son independientes.
+
 
 ###  Formulación de una distribución probable
 
