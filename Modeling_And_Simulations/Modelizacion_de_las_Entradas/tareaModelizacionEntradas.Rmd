@@ -74,7 +74,7 @@ lag.plot(mayo,lags=4,layout=c(2,2),labels=F,do.lines=F)
 
 De nuevo y en concordancia con las gráficas anteriores no vemos correlación en los datos.
 
-###### Análisis 
+###### Análisis: 
 
 De acuerdo con las gráficas anteriores y en especial con el gráfico de correlación se concluye que los datos son independientes.
 
@@ -87,9 +87,10 @@ El histograma nos dará un idea de la forma de la distribución.
 
 ```{r hipotesis 1}
 hist(mayo,prob=T)
+lines(density(mayo))
 ```
 
-De acuerdo con el histograma presentado, notamos que los datos parecen seguir la forma de una distribución Exponencial, sin embargo utilizaremos las estadísticas sobre los datos ya que algunas distribuciones se caracterizan al menos parcialmente por funciones de sus parámetros 
+De acuerdo con el histograma presentado, notamos que los datos parecen seguir la forma de una distribución Gamma o Weibull, sin embargo utilizaremos las estadísticas sobre los datos ya que algunas distribuciones se caracterizan al menos parcialmente por funciones de sus parámetros 
 
 ##### Resumen de estadísticas
 ```{r hipotesis 2}
@@ -112,21 +113,60 @@ cvar
 skewness(mayo)
 ```
 
-Tanto el Coeficiente de variación (cv ~ 1) y el sesgo (v > 0) siguen la hipótesis formulada a partir de la forma del histograma, los datos parecen seguir una distribución Exponencial. 
+Tanto el Coeficiente de variación (cv > 1) y el sesgo (v > 0) siguen la hipótesis formulada a partir de la forma del histograma, los datos parecen seguir una de las dos distribuciones, Gamma o Weibull.
+ya que cv > 1 es probable que el valor de alfa sea menor a 1 en caso de las distribuciones Gamma o Weibull.
+Un Gráfico de caja nos ayuda a afianzar aun mas las hipótesis planteadas. 
 
+```{r hipotesis 6}
+boxplot(mayo)
+```
+
+###### Análisis: 
+Con los valores estadísticos presentados en este inciso vemos que las dos fuertes candidatas son la distribución gamma y la distribución weibull, de acuerdo con este criterio ambas pueden representar de buena forma los datos. 
 
 ### Cálculo de los parámetros para la distribución candidata.
 
-Calculamos el parámetro para la distribucion candidata: Exponencial.
+Calculamos los parámetros para las distribuciones candidatas: Gamma y Weibull.
 ```{r}
 library(MASS)
-lambda =fitdistr(mayo,"exponential")
-lambda
+gamma.par = fitdistr(mayo,"gamma")
+gamma.par
+w.par = fitdistr(mayo,"weibull")
+w.par
 ```
 
 ### Comparación Gráfica
 
-Comparemos graficamente la función de probabilidad acumulada de la distribución con la función de probabilidad empírica de los datos:
+Comparemos graficamente las funciones de probabilidad acumulada de las distribuciones con la función de probabilidad empírica de los datos:
+
+```{r}
+par(mfrow=c(1,2))
+curve(pgamma(x,shape=gamma.par$estimate[1],rate=gamma.par$estimate[2]),from=0, to=20,ylab="Probabilidad acumulada",col="red",lwd=2, main="Gamma")
+lines(ecdf(mayo))
+
+curve(pweibull(x,shape=w.par$estimate[1],scale=w.par$estimate[2]),from=0, to=20,ylab="Probabilidad acumulada",col="blue",lwd=2, main="Weibull")
+lines(ecdf(mayo))
+```
+
+Ambos gráficos lucen prácticamente igual, con esto no podemos tomar ninguna de las dos posibles candidatas ya que hasta ahora las pruebas realizadas muestran que podría ser cualquiera de las dos, por esto bservaremos los gráficos cuantil-cuantil antes de dar una hipótesis final.
+
+```{r}
+par(mfrow=c(1,2))
+qqplot(qgamma(ppoints(500), shape=gamma.par$estimate[1],rate=gamma.par$estimate[2]), mayo, main ="Gamma",xlab="cuantiles teóricos",ylab="cuantiles muestrales" )
+qqline(mayo, distribution = function(p) 
+qgamma(p, shape=gamma.par$estimate[1],rate=gamma.par$estimate[2]),prob = c(0.25, 0.75), col = 2)
+
+qqplot(qweibull(ppoints(500), shape=w.par$estimate[1],scale=w.par$estimate[2]), mayo, main ="Weibull",xlab="cuantiles teóricos",ylab="cuantiles muestrales" )
+qqline(mayo, distribution = function(p) 
+qweibull(p, shape=w.par$estimate[1],scale=w.par$estimate[2]),prob = c(0.25, 0.75), col = 2)
+
+
+```
+
+De nuevo ambos gráficos parecen idénticos sin embargo por muy poco vemos como el de la gamma se ajusta ligeramente más a los datos especialmente en el intervalo [20,30] y [60,70] de los cuantiles teóricos.
+
+###### Análisis: 
+En este punto a pesar de que los últimos gráficos la gamma se ajusta muy ligeramente mejor a los datos, no descartaremos a la distribucion weibull ya que tambien representa muy bien los datos.
 
 ### Indicaciones:
 
