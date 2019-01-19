@@ -39,6 +39,7 @@ Aislamos solo la variable de precipitacion y obtenemos:
 ```{r}
 mayo <- mayo_d$P
 mayo
+n =length(mayo)
 ```
 
 ### Verificación de la independencia de los datos
@@ -56,13 +57,13 @@ Sin embargo veremos que nos dicen las demas técnicas disponibles
 
 ##### Gráfico de las observaciones a lo largo del tiempo
 
-Otra técnica es graficar las observaciones a lo largo del tiempo, esto nos Mostrará si las observaciones muestran tendencias obvias.
+Otra técnica es graficar las observaciones a lo largo del tiempo, esto nos mostrará si las observaciones muestran tendencias obvias.
 
 ```{r autocor2}
 ts.plot(mayo)
 ```
 
-El gráfico a lo largo del tiempo no parece mostrar tendencias obvias otro claro indicio de que los datos son independientes.
+El gráfico a lo largo del tiempo no parece mostrar tendencias obvias, otro claro indicio de que los datos son independientes.
 
 ##### Gráficos de Dispersión
 
@@ -148,7 +149,7 @@ curve(pweibull(x,shape=w.par$estimate[1],scale=w.par$estimate[2]),from=0, to=20,
 lines(ecdf(mayo))
 ```
 
-Ambos gráficos lucen prácticamente igual, con esto no podemos tomar ninguna de las dos posibles candidatas ya que hasta ahora las pruebas realizadas muestran que podría ser cualquiera de las dos, por esto bservaremos los gráficos cuantil-cuantil antes de dar una hipótesis final.
+Ambos gráficos lucen prácticamente igual, con esto no podemos tomar ninguna de las dos posibles candidatas ya que hasta ahora las pruebas realizadas muestran que podría ser cualquiera de las dos, por esto observaremos los gráficos cuantil-cuantil antes de dar una hipótesis final.
 
 ```{r}
 par(mfrow=c(1,2))
@@ -166,7 +167,86 @@ qweibull(p, shape=w.par$estimate[1],scale=w.par$estimate[2]),prob = c(0.25, 0.75
 De nuevo ambos gráficos parecen idénticos sin embargo por muy poco vemos como el de la gamma se ajusta ligeramente más a los datos especialmente en el intervalo [20,30] y [60,70] de los cuantiles teóricos.
 
 ###### Análisis: 
-En este punto a pesar de que los últimos gráficos la gamma se ajusta muy ligeramente mejor a los datos, no descartaremos a la distribucion weibull ya que tambien representa muy bien los datos.
+En este punto a pesar de que los últimos gráficos la gamma se ajusta ligeramente mejor a los datos aparentemente, no descartaremos a la distribucion weibull ya que tambien representa muy bien los datos.
+
+### Pruebas estadísticas de la bondad del ajuste
+
+Realizaremos las Pruebas estadísticas de la bondad del ajuste ya que ellas serán las que nos den el criterio final al escoger alguna de las dos posibles candidatas como modelo para nuestros datos.
+
+#### Chi-cuadrado
+
+##### Cálculo de intervalos
+
+Tendremos que utilizar intervalos que no son equiprobables ya que no existe una formula cerrada para expresar la función de probabilidad acumulada de las distribuciones candidatas (gamma y weibull). Con el fin de definir estos intervalos podemos utilizar el histograma.
+
+```{r}
+hist(mayo,plot=F)
+```
+Debido a que nuestro conjunto de datos tiene la longitud (n) de 80, escogeremos k = 5 intervalos con el fin de tratar de lograr n/k = 16, observaciones por cada intervalo.
+Con la información anterior podemos tomar k intervalos de clase donde los limites serán [0, 10], [10, 20], [20, 40], [40, 50] y [50, 60]. Con esto podemos calcular las frecuencias observadas para cada uno de los intervalos.
+
+```{r}
+lim = c(0, 10, 20, 40, 50, 60)
+k = 5
+obs = table(cut(mayo, lim))
+obs
+```
+
+Sin embargo, vemos como las frecuencias para los intervalos además de ser bastante irregulares no nos da la frecuencia por intervalo mínima recomendada para cada uno, por esto procedemos a modificar manualmente cada intervalo con el fin de logar la frecuencia esperada por cada intervalo.
+
+```{r}
+lim = c(0, 1, 3, 7, 12, 60)
+k = 5
+obs = table(cut(mayo, lim))
+obs
+```
+
+##### Cálculo de las esperadas
+
+```{r esperadas}
+p.gam = numeric(k)
+p.w = numeric(k)
+for (i in 1:k) {
+  p.gam[i] = pgamma(lim[i+1],shape=gamma.par$estimate[1],rate=gamma.par$estimate[2])-pgamma(lim[i],shape=gamma.par$estimate[1],rate=gamma.par$estimate[2])
+  p.w[i] = pweibull(lim[i+1],shape=w.par$estimate[1],scale=w.par$estimate[2])-pweibull(lim[i],shape=w.par$estimate[1],scale=w.par$estimate[2])
+}
+esperada.gam = n*p.gam
+esperada.w = n*p.w
+```
+
+Una vez calculadas las esperadas podemos proceder a calcular los estadísticos.
+
+##### Cálculo de los estadísticos
+
+```{r estadisticos}
+X2_g = sum((obs - esperada.gam)^2/esperada.gam)
+X2_g
+X2_w = sum((obs - esperada.w)^2/esperada.w)
+X2_w
+```
+
+##### Cálculo del Valor Crítico.
+
+para ello necesitamos calcular los grados de libertad de nuestro conjunto de datos.
+
+```{r gl}
+alfa = 0.1
+n.p = 2
+gl = length(obs) - n.p - 1 
+```
+
+finalmente el valor crítico
+
+```{r critico}
+X2_c =qchisq(1-alfa,gl) 
+X2_c
+```
+
+###### Análisis:
+
+Ninguna de las dos distribuciones puede ser rechazada como un modelo para los datos debido a que X2_w < X2_c y X2_g < X2_c. Sin embargo, ya que X2_w < X2_g se toma como modelo la distribución Weibul.
+
+## Conclusiones finales
 
 ### Indicaciones:
 
