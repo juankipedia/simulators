@@ -1,7 +1,7 @@
 ---
 title: 'Modelización de datos de entrada'
 author: "Juan Diego M. Flores"
-date: "16 de enero de 2019"
+date: "Enero/2019"
 output: html_document
 ---
 
@@ -18,6 +18,14 @@ los diferentes meses pueden tener diferentes distribuciones de probabilidad.
 En particular, los datos de este ejercicio corresponden a la localidad de Gavidia,
 en el páramo merideño durante los años 2000 a 2004. Los datos ya han sido procesados
 y se encuentren en un data frame con dos columnas M (mes) y P (precipitación).
+Tome en cuenta solo las posibles candidatas:
+  + La exponencial
+
+  + La Gamma
+
+  + La Weibull
+
+  + La Logonormal
 
 ### Carga de Datos
 
@@ -51,7 +59,7 @@ La primera técnica y la más explicita es el gráfico de autocorrelación
 acf(mayo)
 ```
 
-De acuerdo a este gráfico se logro ver que no se muestra correlacion significativa para los retardos, esto representa
+De acuerdo con este gráfico se logro ver que no se muestra correlacion significativa para los retardos, esto representa
 un fuerte indicio de que las observaciones son independientes entre sí. Es decir los datos no parecen estar correlacionados serialmente.
 Sin embargo veremos que nos dicen las demas técnicas disponibles
 
@@ -91,7 +99,7 @@ hist(mayo,prob=T)
 lines(density(mayo))
 ```
 
-De acuerdo con el histograma presentado, notamos que los datos parecen seguir la forma de una distribución Gamma o Weibull, sin embargo utilizaremos las estadísticas sobre los datos ya que algunas distribuciones se caracterizan al menos parcialmente por funciones de sus parámetros 
+De acuerdo con el histograma presentado, notamos que los datos parecen seguir la forma de una distribución Gamma o Weibull, ya que es sesgada a la derecha sin embargo utilizaremos las estadísticas sobre los datos ya que algunas distribuciones se caracterizan al menos parcialmente por funciones de sus parámetros 
 
 ##### Resumen de estadísticas
 ```{r hipotesis 2}
@@ -114,7 +122,7 @@ cvar
 skewness(mayo)
 ```
 
-Tanto el Coeficiente de variación (cv > 1) y el sesgo (v > 0) siguen la hipótesis formulada a partir de la forma del histograma, los datos parecen seguir una de las dos distribuciones, Gamma o Weibull.
+Tanto el Coeficiente de variación (cv > 1) y el sesgo (v > 0) siguen la hipótesis formulada a partir de la forma del histograma, los datos parecen seguir las distribuciones, Gamma o Weibull.
 ya que cv > 1 es probable que el valor de alfa sea menor a 1 en caso de las distribuciones Gamma o Weibull.
 Un Gráfico de caja nos ayuda a afianzar aun mas las hipótesis planteadas. 
 
@@ -123,7 +131,7 @@ boxplot(mayo)
 ```
 
 ###### Análisis: 
-Con los valores estadísticos presentados en este inciso vemos que las dos fuertes candidatas son la distribución gamma y la distribución weibull, de acuerdo con este criterio ambas pueden representar de buena forma los datos. 
+Con los valores estadísticos presentados en este inciso vemos que las dos fuertes candidatas son la distribución Gamma y la distribución Weibull, de acuerdo con este criterio ambas pueden representar de buena forma los datos. 
 
 ### Cálculo de los parámetros para la distribución candidata.
 
@@ -164,10 +172,10 @@ qweibull(p, shape=w.par$estimate[1],scale=w.par$estimate[2]),prob = c(0.25, 0.75
 
 ```
 
-De nuevo ambos gráficos parecen idénticos sin embargo por muy poco vemos como el de la gamma se ajusta ligeramente más a los datos especialmente en el intervalo [20,30] y [60,70] de los cuantiles teóricos.
+De nuevo ambos gráficos parecen idénticos sin embargo por muy poco vemos como el de la Gamma se ajusta ligeramente mejor a los datos especialmente en el intervalo [20,30] y [60,70] de los cuantiles teóricos.
 
 ###### Análisis: 
-En este punto a pesar de que los últimos gráficos la gamma se ajusta ligeramente mejor a los datos aparentemente, no descartaremos a la distribucion weibull ya que tambien representa muy bien los datos.
+En este punto a pesar de que los últimos gráficos la gamma se ajusta ligeramente mejor a los datos aparentemente, no descartaremos a la distribucion Weibull ya que tambien representa muy bien los datos.
 
 ### Pruebas estadísticas de la bondad del ajuste
 
@@ -177,7 +185,7 @@ Realizaremos las Pruebas estadísticas de la bondad del ajuste ya que ellas ser�
 
 ##### Cálculo de intervalos
 
-Tendremos que utilizar intervalos que no son equiprobables ya que no existe una formula cerrada para expresar la función de probabilidad acumulada de las distribuciones candidatas (gamma y weibull). Con el fin de definir estos intervalos podemos utilizar el histograma.
+Tendremos que utilizar intervalos que no son equiprobables ya que no existe una formula cerrada para expresar la función de probabilidad acumulada de las distribuciones candidatas (Gamma y Weibull). Con el fin de definir estos intervalos podemos utilizar el histograma.
 
 ```{r}
 hist(mayo,plot=F)
@@ -230,7 +238,7 @@ X2_w
 para ello necesitamos calcular los grados de libertad de nuestro conjunto de datos.
 
 ```{r gl}
-alfa = 0.1
+alfa = 0.05
 n.p = 2
 gl = length(obs) - n.p - 1 
 ```
@@ -244,31 +252,12 @@ X2_c
 
 ###### Análisis:
 
-Ninguna de las dos distribuciones puede ser rechazada como un modelo para los datos debido a que X2_w < X2_c y X2_g < X2_c. Sin embargo, ya que X2_w < X2_g se toma como modelo la distribución Weibul.
+Ninguna de las dos distribuciones puede ser rechazada como un modelo para los datos debido a que X2_w < X2_c y X2_g < X2_c. A estos tipos de casos se les llama empate técnico. Sin embargo en el caso de escoger solo una de las dos, como X2_w < X2_g se toma como modelo la distribución Weibull.
+
+#### Kolmogorov-Smirnov
 
 ## Conclusiones finales
 
-### Indicaciones:
-
-1. Algunas referencias interesantes para este tema y el proyecto
-
-  + Gráfico con las distribuciones de probabilidad y sus relaciones https://www.johndcook.com/blog/distribution_chart/
-  
-  + Grafico de selección de las distribuciones: 
-  ![](seleccionDistribuciones.png)
-  
-Fuente: http://people.stern.nyu.edu/adamodar/pdfiles/papers/probabilistic.pdf
-
-2. Distribuciones comunes para modelizar datos de precipitacion son:
-
-  + La exponencial
-
-  + La Gamma
-
-  + La Weibull
-
-  + La Logonormal
-
-Asi que estas deben ser sus principales "sospechosas".
+Los datos de las precipitaciones del mes de mayo de la comunidad de Gavidia son datos independientes de acuerdo con las pruebas realizadas. Para estos datos vemos como se obtuvo un empate técnico a la hora de escoger una distribución que representara a los datos, dicho empate ocurrió entre la distribución Weibull y la distribución Gamma, se mostró como los gráficos de las funciones de probabilidad acumulada y la función de probabilidad empírica de los datos corroboraban dicho empate técnico. Los gráficos cuantil-cuantil también secundan esta hipótesis, dichos gráficos (cuantil-cuantil) mostraron como la distribución Gamma se ajusta ligeramente mejor, a pesar de esto no se tomó ninguna conclusión ya que la comparación de gráficos son técnicas cualitativas y no podemos tomar conclusiones a partir de ellos solamente. Debido a esto, se realizaron Pruebas estadísticas de la bondad del ajuste, específicamente la prueba chi-cuadrado y la prueba Kolmogorov-Smirnov en ambos casos vemos como el resultado concuerda con lo expuesto en las pruebas y técnicas anteriores, existe un empate técnico entre la distribución Gamma y la distribución Weibull, sin embargo, vemos como en la prueba chi-cuadrado el estadístico para la Gamma es X2_g =  0.487924 y para la Weibull X2_w = 0.4116705 esto quiere decir que en caso de seleccionar una de las dos, seleccionaríamos la distribución Weibull ya que X2_w < X2_g, este al ser un criterio cuantitativo seria el criterio final a la hora de escoger alguna de las dos distribuciones, pero ninguna de las dos puede ser rechazada, ambas representan muy bien los datos.
 
  
