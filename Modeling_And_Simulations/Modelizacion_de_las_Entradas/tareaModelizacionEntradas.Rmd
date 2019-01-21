@@ -256,9 +256,18 @@ Ninguna de las dos distribuciones puede ser rechazada como un modelo para los da
 
 #### Kolmogorov-Smirnov
 
-```{r critico}
-mayo
+##### Gamma
+```{r}
+ks.test(mayo,"pgamma",shape = gamma.par$estimate["shape"], rate = gamma.par$estimate["rate"])
 ```
+
+##### Weibull
+```{r}
+ks.test(mayo,"pweibull",shape = w.par$estimate["shape"], scale = w.par$estimate["scale"])
+```
+
+###### Análisis:
+
 ## Conclusiones finales
 
 Los datos de las precipitaciones del mes de mayo de la comunidad de Gavidia son datos independientes de acuerdo con las pruebas realizadas. Para estos datos vemos como se obtuvo un empate técnico a la hora de escoger una distribución que representara a los datos, dicho empate ocurrió entre la distribución Weibull y la distribución Gamma, se mostró como los gráficos de las funciones de probabilidad acumulada y la función de probabilidad empírica de los datos corroboraban dicho empate técnico. Los gráficos cuantil-cuantil también secundan esta hipótesis, dichos gráficos (cuantil-cuantil) mostraron como la distribución Gamma se ajusta ligeramente mejor, a pesar de esto no se tomó ninguna conclusión ya que la comparación de gráficos son técnicas cualitativas y no podemos tomar conclusiones a partir de ellos solamente. Debido a esto, se realizaron Pruebas estadísticas de la bondad del ajuste, específicamente la prueba chi-cuadrado y la prueba Kolmogorov-Smirnov en ambos casos vemos como el resultado concuerda con lo expuesto en las pruebas y técnicas anteriores, existe un empate técnico entre la distribución Gamma y la distribución Weibull, sin embargo, vemos como en la prueba chi-cuadrado el estadístico para la Gamma es X2_g =  0.487924 y para la Weibull X2_w = 0.4116705 esto quiere decir que en caso de seleccionar una de las dos, seleccionaríamos la distribución Weibull ya que X2_w < X2_g, este al ser un criterio cuantitativo seria el criterio final a la hora de escoger alguna de las dos distribuciones, pero ninguna de las dos puede ser rechazada, ambas representan muy bien los datos.

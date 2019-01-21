@@ -429,6 +429,34 @@ X2_c</code></pre>
 </div>
 <div id="kolmogorov-smirnov" class="section level4">
 <h4>Kolmogorov-Smirnov</h4>
+<div id="gamma" class="section level5">
+<h5>Gamma</h5>
+<pre class="r"><code>ks.test(mayo,&quot;pgamma&quot;,shape = gamma.par$estimate[&quot;shape&quot;], rate = gamma.par$estimate[&quot;rate&quot;])</code></pre>
+<pre><code>## Warning in ks.test(mayo, &quot;pgamma&quot;, shape = gamma.par$estimate[&quot;shape&quot;], :
+## ties should not be present for the Kolmogorov-Smirnov test</code></pre>
+<pre><code>## 
+##  One-sample Kolmogorov-Smirnov test
+## 
+## data:  mayo
+## D = 0.059587, p-value = 0.9389
+## alternative hypothesis: two-sided</code></pre>
+</div>
+<div id="weibull" class="section level5">
+<h5>Weibull</h5>
+<pre class="r"><code>ks.test(mayo,&quot;pweibull&quot;,shape = w.par$estimate[&quot;shape&quot;], scale = w.par$estimate[&quot;scale&quot;])</code></pre>
+<pre><code>## Warning in ks.test(mayo, &quot;pweibull&quot;, shape = w.par$estimate[&quot;shape&quot;], scale
+## = w.par$estimate[&quot;scale&quot;]): ties should not be present for the Kolmogorov-
+## Smirnov test</code></pre>
+<pre><code>## 
+##  One-sample Kolmogorov-Smirnov test
+## 
+## data:  mayo
+## D = 0.055167, p-value = 0.968
+## alternative hypothesis: two-sided</code></pre>
+<div id="analisis-4" class="section level6">
+<h6>Análisis:</h6>
+</div>
+</div>
 </div>
 </div>
 </div>
