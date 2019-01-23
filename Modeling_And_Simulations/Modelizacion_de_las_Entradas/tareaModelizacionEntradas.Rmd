@@ -256,6 +256,8 @@ Ninguna de las dos distribuciones puede ser rechazada como un modelo para los da
 
 #### Kolmogorov-Smirnov
 
+Con el fin de comprobar todo lo expuesto hasta este punto realizaremos la prueba Kolmogorov-Smirnov.
+
 ##### Gamma
 ```{r}
 ks.test(mayo,"pgamma",shape = gamma.par$estimate["shape"], rate = gamma.par$estimate["rate"])
@@ -267,6 +269,8 @@ ks.test(mayo,"pweibull",shape = w.par$estimate["shape"], scale = w.par$estimate[
 ```
 
 ###### Análisis:
+
+De nuevo y en concordancia con lo visto anteriormente la prueba “KS” ratifica el empate técnico donde ambas candidatas son buenas representantes de los datos 
 
 ## Conclusiones finales
 
