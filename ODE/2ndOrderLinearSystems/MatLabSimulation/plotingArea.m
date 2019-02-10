@@ -1,7 +1,13 @@
 function [T,X] = plotingArea()
+    clear all
+    close all
+    global u
+    
     tspan = [0 5];
-    x1_0 = 2;
-    x2_0 = 0;
-    [T,X] = ode23(@secondOrder,tspan,[x1_0 x2_0]);
-    plot(X(:,1),X(:,2))
+    x0=[1 1]*0;
+    u=1;
+    [T,X] = ode45(@secondOrder,tspan,x0);
+    plot(T,X(:,1))
 end
+
+
