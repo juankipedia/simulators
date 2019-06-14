@@ -10,6 +10,11 @@
 	
 	with initial conditions I = i(0) and  V = v(0).
 	
+	At the equilibrium:
+
+	v = 72.2V
+	i = 1.8A
+
  */
 
 
@@ -21,7 +26,7 @@ typedef unsigned long long int ulli;
 
 ulli n; 
 long double a, b, I, V, w, z, t, h;
-const long double U = 0.5;
+const long double U = 1;
 
 long double f(long double i, long double v){
 	return -200 * i - 20 * v - 1800 * U;
@@ -31,9 +36,9 @@ long double g(long double i, long double v){
 	return 5e4 * i - (5000/9) * v + 5e4 * U;
 }
 
-int main(){
+void read_input(){
 	cout << endl;
-	
+
 	cout << "Please Insert Lower Bound" << endl;
 	cin >> a;
 	cout << endl;
@@ -55,14 +60,23 @@ int main(){
 	cout << "Please Insert Initial condition for the Voltage V(0)" << endl;
 	cin >> V;
 	cout << endl;
+}
+
+int main(){
+
+	read_input();
+
+	std::ofstream oi;
+ 	oi.open ("currentData.txt");
+
+	std::ofstream ov;
+ 	ov.open ("voltageData.txt");
 
 	t = a; w = I; z = V; h = (b - a)/ n;
 
-	vector<pair<long double, long double>> it;
-	vector<pair<long double, long double>> vt;
-	
-	it.push_back(make_pair(t, w));
-	vt.push_back(make_pair(t, z));
+
+	oi << t << " " << w << endl;
+	ov << t << " " << z << endl;
 	
 	for(ulli i = 1; i <= n; i++){
 
@@ -78,15 +92,15 @@ int main(){
 		long double k4 = h * f(w + k3, z + l3);
 		long double l4 = h * g(w + k3, z + l3);  
 
-		w = w + (k1 + 2 * k2 + 2 * k3 + k4)/6;
-		z = z + (l1 + 2 * l2 + 2 * l3 + l4)/6;
+		w += (k1 + 2 * k2 + 2 * k3 + k4)/6;
+		z += (l1 + 2 * l2 + 2 * l3 + l4)/6;
 
-		t = a + i * h;
+		t = t + h;
 		
-		it.push_back(make_pair(t, w));
-		vt.push_back(make_pair(t, z));
+		oi << t << " " << -w << endl;
+		ov << t << " " << -z << endl;
 	}
 
-
+	oi.close(); ov.close();
 	return 0;
 }
