@@ -2,8 +2,14 @@
 	This is a simulation for a boost comverter using Runge Kutta method.
 	Linear System is as follows:
 	
-	di/dt = (-200)i - (20)v - (1800)U
-	dv/dt = (5e4)i - (5000/9)v + (5e4)U
+		di/dt = (-200)i - (20)v - (1800)U
+		dv/dt = (5e4)i - (5000/9)v + (5e4)U
+
+	system is going to be aproximated on:
+		a <= t <= b
+	
+	with initial conditions I = i(0) and  V = v(0).
+	
  */
 
 
@@ -52,10 +58,11 @@ int main(){
 
 	t = a; w = I; z = V; h = (b - a)/ n;
 
-	vector<tuple<long double, long double, long double>> p;
-	p.push_back(make_tuple(t, w, z));
+	vector<pair<long double, long double>> it;
+	vector<pair<long double, long double>> vt;
 	
-	cout << t << " " << w  << endl;
+	it.push_back(make_pair(t, w));
+	vt.push_back(make_pair(t, z));
 	
 	for(ulli i = 1; i <= n; i++){
 
@@ -75,9 +82,9 @@ int main(){
 		z = z + (l1 + 2 * l2 + 2 * l3 + l4)/6;
 
 		t = a + i * h;
-		p.push_back(make_tuple(t, w, z));
-
-		cout << t << " " << w  << endl;
+		
+		it.push_back(make_pair(t, w));
+		vt.push_back(make_pair(t, z));
 	}
 
 
