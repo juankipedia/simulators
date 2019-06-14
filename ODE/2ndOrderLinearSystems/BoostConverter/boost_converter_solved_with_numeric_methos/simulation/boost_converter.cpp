@@ -11,10 +11,8 @@
 	with initial conditions I = i(0) and  V = v(0).
 	
 	At the equilibrium:
-
 	v = 72.2V
 	i = 1.8A
-
  */
 
 
