@@ -1,3 +1,12 @@
+/*
+	This is a simulation for a boost comverter using Runge Kutta method.
+	Linear System is as follows:
+	
+	di/dt = (-200)i - (20)v - (1800)U
+	dv/dt = (5e4)i - (5000/9)v + (5e4)U
+ */
+
+
 #include <bits/stdc++.h>
 using namespace std;
 
