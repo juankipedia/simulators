@@ -1,18 +1,14 @@
 /*
 	This is a simulation for a boost comverter using Runge Kutta method.
-	Linear System is as follows:
+	System is as follows:
 	
-		di/dt = (-200)i - (20)v - (1800)U
-		dv/dt = (5e4)i - (5000/9)v + (5e4)U
+		di/dt = -200i - (U(v)/ 0.05) + 2000U
+		dv/dt = - (5000/9)v +  ((i)U/ 0.00002)
 
 	system is going to be aproximated on:
 		a <= t <= b
 	
 	with initial conditions I = i(0) and  V = v(0).
-	
-	At the equilibrium:
-	v = 72.2V
-	i = 1.8A
  */
 
 
@@ -27,11 +23,11 @@ long double a, b, I, V, w, z, t, h;
 const long double U = 1;
 
 long double f(long double i, long double v){
-	return -200 * i - 20 * v - 1800 * U;
+	return -200 * i - (U * v/ 0.05) + 2000 * U;
 }
 
 long double g(long double i, long double v){
-	return 5e4 * i - (5000/9) * v + 5e4 * U;
+	return - (5000/9) * v +  (i * U/ 0.00002);
 }
 
 void read_input(){
@@ -95,8 +91,8 @@ int main(){
 
 		t = t + h;
 		
-		oi << t << " " << -w << endl;
-		ov << t << " " << -z << endl;
+		oi << t << " " << w << endl;
+		ov << t << " " << z << endl;
 	}
 
 	oi.close(); ov.close();
