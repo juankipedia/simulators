@@ -24,7 +24,7 @@ PROGRAM: ; main program routine
 	;output result of the program
   	RET
 
-# org 00c0H
+# org 00C0H
 R_AND_S_T_R: ; read and save table routine (reads edges of graph)
 	MVI B, 00H; sets register B to 0 pointing to first exchange rate
 	MVI A, 09H; sets register A with upper bound of B n * n
