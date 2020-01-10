@@ -1,8 +1,7 @@
 JMP INIT
 
-
 # org 003CH
-CALL KB_IN; sets 7 point 5 Interrupt Service Routine
+JMP KB_IN; sets 7 point 5 Interrupt Service Routine
 
 
 # org 0040H
@@ -24,23 +23,37 @@ PROGRAM: ; main program routine
 	;output result of the program
   	RET
 
-# org 0100H
+# org 00c0H
 R_AND_S_T_R: ; read and save table routine (reads edges of graph)
 	MVI B, 00H; sets register B to 0 pointing to first exchange rate
 	MVI A, 09H; sets register A with upper bound of B n * n
 	CMP B; if B == 9
-	JZ 0046H; if B == 9 then jump to instruction on location 0046H
+	JZ 00CFH; if B == 9 then jump to R_AND_S_T_R RET
 	
 	CALL R_EXCHANGE_RATE;
 
 	INR B; B += 1
-	JMP 0102H; to instruction in location 0102H
+	JMP 00C4H;  jumps to if B == 9
   	RET
 
-# org 0200H
+# org 0100H
 R_EXCHANGE_RATE: ; reads exchange rate pointed by register B 
 	RET
 
-# org 0400H
- KB_IN: ;keyboard interrupt function
-  	RET
+# org 0180H
+E_KEYBOARD: ;enables keyboard by EI, and waits until key is pressed
+	EI; enables keyboard interrupts
+LOOP_EK: 	JMP LOOP_EK; waits until keyboard interrupts 
+	RET
+
+# org 0185H
+D_KEYBOARD:
+	DI; disables keyboard interrupts
+	RET
+
+# org 01C0H
+KB_IN: ;keyboard interrupt function
+	JMP 0184H; jumps to E_KEYBOARD RET instruction
+  	
+
+  	
