@@ -6,6 +6,7 @@ JMP KB_IN; sets 7 point 5 Interrupt Service Routine
 
 # org 0040H
 INIT : ; inits interrupts and devices
+	LXI SP, 0200H; sets stack pointer memory location 
 	MVI A,04H; prepare the mask to enable 7 poitn 5 interrupt
 	SIM; apply the settings RTS masks
 	;SET 8 8-bit character display -left entry and decoded scan keyboard 2-key lockout
