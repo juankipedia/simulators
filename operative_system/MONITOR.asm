@@ -6,7 +6,7 @@ JMP KB_IN; sets 7 point 5 Interrupt Service Routine
 
 # org 0040H
 INIT : ; inits interrupts and devices
-	LXI SP, 0200H; sets stack pointer memory location 
+	LXI SP, 0240H; sets stack pointer memory location 
 	MVI A,04H; prepare the mask to enable 7 poitn 5 interrupt
 	SIM; apply the settings RTS masks
 	;SET 8 8-bit character display -left entry and decoded scan keyboard 2-key lockout
@@ -34,7 +34,7 @@ R_AND_S_T_R: ; read and save table routine (reads edges of graph)
 	CALL R_EXCHANGE_RATE;
 
 	INR B; B += 1
-	JMP 00C4H;  jumps to if B == 9
+	JMP 00C2H;  jumps to if A = 9
   	RET
 
 # org 0100H
@@ -55,6 +55,3 @@ D_KEYBOARD:
 # org 01C0H
 KB_IN: ;keyboard interrupt function
 	JMP 0184H; jumps to E_KEYBOARD RET instruction
-  	
-
-  	
