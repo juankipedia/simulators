@@ -9,7 +9,11 @@ INIT : ; inits interrupts and devices
 	LXI SP, 0240H; sets stack pointer memory location 
 	MVI A,04H; prepare the mask to enable 7 poitn 5 interrupt
 	SIM; apply the settings RTS masks
-	;SET 8 8-bit character display -left entry and decoded scan keyboard 2-key lockout
+
+;SET 8 8-bit character display -left entry and decoded scan keyboard n-Key Rollover
+	LXI H, 2000H;  sets !CS - A14 to 0 to activate 8279 and A13 - C/D to 1 to send a command to the 8279
+	MVI M, 03H; sets 000 [00] [011] that is the desire configuration
+
 	
 R_AND_S_T: ; read and save table
 	CALL R_AND_S_T_R; calls read and save table routine
