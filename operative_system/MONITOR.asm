@@ -31,18 +31,20 @@ PROGRAM: ; main program routine
 # org 00C0H
 R_AND_S_T_R: ; read and save table routine (reads edges of graph)
 	MVI B, 00H; sets register B to 0 pointing to first exchange rate
-	MVI A, 09H; sets register A with upper bound of B n * n
-	CMP B; if B == 9
-	JZ 00CFH; if B == 9 then jump to R_AND_S_T_R RET
+	MVI A, 06H; sets register A with upper bound of B (n * n) - n
+	CMP B; if B == 6
+	JZ 00CFH; if B == 6 then jump to R_AND_S_T_R RET
 	
 	CALL R_EXCHANGE_RATE;
 
 	INR B; B += 1
-	JMP 00C2H;  jumps to if A = 9
+	JMP 00C2H;  jumps to if A = 6
   	RET
 
 # org 0100H
-R_EXCHANGE_RATE: ; reads exchange rate pointed by register B 
+R_EXCHANGE_RATE: ; reads exchange rate pointed by register B
+
+	; it calls 3 functions OUTPUT_DISPLAY(B), INPUT_RATE(B),  SAVE_RATE(B)
 	RET
 
 # org 0180H
@@ -59,3 +61,21 @@ D_KEYBOARD:
 # org 01C0H
 KB_IN: ;keyboard interrupt function
 	JMP 0184H; jumps to E_KEYBOARD RET instruction
+
+# org 03C0H
+OUTPUT_DISPLAY
+	RET
+
+# org 05C0H
+INPUT
+	RET
+
+# org 07C0H
+SAVE_RATE
+	RET
+
+# org 07E9H
+ADJUST
+	RET
+
+
