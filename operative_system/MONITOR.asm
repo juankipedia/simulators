@@ -6,12 +6,12 @@ JMP KB_IN; sets 7 point 5 Interrupt Service Routine
 
 # org 0040H
 INIT : ; inits interrupts and devices
-	LXI SP, 0240H; sets stack pointer memory location 
+	LXI SP, 5868H; sets stack pointer memory location 
 	MVI A,04H; prepare the mask to enable 7 poitn 5 interrupt
 	SIM; apply the settings RTS masks
 
 ;SET 8 8-bit character display -left entry and decoded scan keyboard n-Key Rollover
-	LXI H, 2000H;  sets !CS - A14 to 0 to activate 8279 and A13 - C/D to 1 to send a command to the 8279
+	LXI H, 2800H;  sets !CS - A14 to 0 to activate 8279 and A13 - C/D to 1 to send a command to the 8279
 	MVI M, 03H; sets 000 [00] [011] that is the desire configuration
 
 	
@@ -33,9 +33,15 @@ R_AND_S_T_R: ; read and save table routine (reads edges of graph)
 	MVI B, 00H; sets register B to 0 pointing to first exchange rate
 	MVI A, 06H; sets register A with upper bound of B (n * n) - n
 	CMP B; if B == 6
-	JZ 00CFH; if B == 6 then jump to R_AND_S_T_R RET
-	
+	JZ 00D7H; if B == 6 then jump to R_AND_S_T_R RET
+
+	LXI H, 5822H; direction where register B will be saved before calling the function
+	MOV M,B; save the register
+
 	CALL R_EXCHANGE_RATE;
+
+	LXI H, 5822H; load direction of register B in memory
+	MOV B,M; restore register B
 
 	INR B; B += 1
 	JMP 00C2H;  jumps to if A = 6
@@ -63,19 +69,17 @@ KB_IN: ;keyboard interrupt function
 	JMP 0184H; jumps to E_KEYBOARD RET instruction
 
 # org 03C0H
-OUTPUT_DISPLAY
+O_D:
 	RET
 
 # org 05C0H
-INPUT
+INPUT:
 	RET
 
 # org 07C0H
-SAVE_RATE
+SAVE_RATE:
 	RET
 
 # org 07E9H
-ADJUST
+ADJUST:
 	RET
-
-
