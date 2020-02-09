@@ -68,18 +68,12 @@ D_KEYBOARD:
 KB_IN: ;keyboard interrupt function
 	JMP 0184H; jumps to E_KEYBOARD RET instruction
 
-# org 03C0H
-O_D:
-	RET
-
-# org 05C0H
+# org 01C3H
 INPUT:
 	RET
-
-# org 07C0H
+O_D:
+	RET
 SAVE_RATE:
 	RET
-
-# org 07E9H
 ADJUST:
 	RET
