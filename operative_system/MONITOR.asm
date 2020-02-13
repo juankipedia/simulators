@@ -6,12 +6,12 @@ JMP KB_IN; sets 7 point 5 Interrupt Service Routine
 
 # org 0040H
 INIT : ; inits interrupts and devices
-	LXI SP, 5868H; sets stack pointer memory location 
+	LXI SP, 1868H; sets stack pointer memory location 
 	MVI A,04H; prepare the mask to enable 7 poitn 5 interrupt
 	SIM; apply the settings RTS masks
 
 ;SET 8 8-bit character display -left entry and decoded scan keyboard n-Key Rollover
-	LXI H, 2800H;  sets !CS - A14 to 0 to activate 8279 and A13 - C/D to 1 to send a command to the 8279
+	LXI H, 6800H;  sets !CS - A14 to 0 to activate 8279 and A13 - C/D to 1 to send a command to the 8279
 	MVI M, 03H; sets 000 [00] [011] that is the desire configuration
 
 	
@@ -35,12 +35,12 @@ R_AND_S_T_R: ; read and save table routine (reads edges of graph)
 	CMP B; if B == 6
 	JZ 00D7H; if B == 6 then jump to R_AND_S_T_R RET
 
-	LXI H, 5822H; direction where register B will be saved before calling the function
+	LXI H, 1822H; direction where register B will be saved before calling the function
 	MOV M,B; save the register
 
 	CALL R_EXCHANGE_RATE;
 
-	LXI H, 5822H; load direction of register B in memory
+	LXI H, 1822H; load direction of register B in memory
 	MOV B,M; restore register B
 
 	INR B; B += 1
@@ -89,7 +89,7 @@ INPUT:
 	CALL D_KEYBOARD; Se deshabilita el keyboard
 	
 	CALL S_NUMBER_C ; Simula la entrada del word-status
-	LDA 0800H;Se lee el word status FIFO del 8279
+	LDA 4800H;Se lee el word status FIFO del 8279
 
 	CALL GET_NUMBER_C ;obtiene numero de caracteres en
 	;FIFO
@@ -120,7 +120,7 @@ END_LOOP:
 
 INPUT_LOOP:
 	CALL S_KEY_ENTRY; simula entrada de un caracter
-	LDA 0800H;Se lee un caracter de la FIFO
+	LDA 4800H;Se lee un caracter de la FIFO
 	STAX D;Almacena el caracter en RAM
 	;en la direccion contenida en los registros D,E
 	INX D;Se incrementa la direccion D,E en uno
@@ -149,17 +149,17 @@ GET_NUMBER_C:
 	RET
 
 SAVE_NC_RAM:
-	;Saves number of characters in FIFO on 5869H RAM
-	;and load D and E regs with data 5869H
+	;Saves number of characters in FIFO on 1869H RAM
+	;and load D and E regs with data 1869H
 
 	; Cuando  se llama a esta rutina en el reg B se debe
 	; enecontrar
 	; el numero de caracteres que hay en FIFO 
 
 	MOV A,B; El valor del reg B se pasa al reg A
-	STA 5869H; Guarda en la direccion RAM 5869H
+	STA 1869H; Guarda en la direccion RAM 1869H
 		;el numero de caracteres en FIFO (reg A)
-	LXI D, 586AH;Carga la direccion 586AH en los regs D y E
+	LXI D, 186AH;Carga la direccion 186AH en los regs D y E
 		;por ser la direccion donde se comensaran
 		;a guardar los caracteres leidos del 8279
 	RET
@@ -265,7 +265,7 @@ S_NUMBER_C_R:
 
 	MOV A,C; el numero de caracteres en reg C se pasan al
 	; regA
-	STA 0800H;SE almacena reg A en la direccion 0800H
+	STA 4800H;SE almacena reg A en la direccion 4800H
 	; Creando la simulacion, pues seguidamente se llamara
 	; a las rutinas que leen el status-word del FIFO del 8279
 	
@@ -327,55 +327,55 @@ S_KEY_ENTRY: ; Simula la entrada de un caracter
 IN_F8:
 	IN F8H; Lee un dato por el puerto F8H
 	;Se almacena en el reg A
-	STA 0800H; Almacena el dato en reg A, en la direccion
-	; 0800H
+	STA 4800H; Almacena el dato en reg A, en la direccion
+	; 4800H
 
 	;Nota: La razon por la que se almacena en la direccion
-	; de memoria 0800H, es porque esto es una simulacion
+	; de memoria 4800H, es porque esto es una simulacion
 	; de la entrada de un caracter, y el monitor seguidamente
-	; a esta rutina leera el caracter en la direcion 0800H
+	; a esta rutina leera el caracter en la direcion 4800H
 	RET
 IN_F9:
 	IN F9H; Lee un dato por el puerto F9H
 	;Se almacena en el reg A
-	STA 0800H; Almacena el dato en reg A, en la direccion
-	; 0800H
+	STA 4800H; Almacena el dato en reg A, en la direccion
+	; 4800H
 	RET
 IN_FA:
 	IN FAH; Lee un dato por el puerto FAH
 	;Se almacena en el reg A
-	STA 0800H; Almacena el dato en reg A, en la direccion
-	; 0800H
+	STA 4800H; Almacena el dato en reg A, en la direccion
+	; 4800H
 	RET
 IN_FB:
 	IN FBH; Lee un dato por el puerto FBH
 	;Se almacena en el reg A
-	STA 0800H; Almacena el dato en reg A, en la direccion
-	; 0800H
+	STA 4800H; Almacena el dato en reg A, en la direccion
+	; 4800H
 	RET
 IN_FC:
 	IN FCH; Lee un dato por el puerto FCH
 	;Se almacena en el reg A
-	STA 0800H; Almacena el dato en reg A, en la direccion
-	; 0800H
+	STA 4800H; Almacena el dato en reg A, en la direccion
+	; 4800H
 	RET
 IN_FD:
 	IN FDH; Lee un dato por el puerto FDH
 	;Se almacena en el reg A
-	STA 0800H; Almacena el dato en reg A, en la direccion
-	; 0800H
+	STA 4800H; Almacena el dato en reg A, en la direccion
+	; 4800H
 	RET
 IN_FE:
 	IN FEH; Lee un dato por el puerto FEH
 	;Se almacena en el reg A
-	STA 0800H; Almacena el dato en reg A, en la direccion
-	; 0800H
+	STA 4800H; Almacena el dato en reg A, en la direccion
+	; 4800H
 	RET
 IN_FF:
 	IN FFH; Lee un dato por el puerto FFH
 	;Se almacena en el reg A
-	STA 0800H; Almacena el dato en reg A, en la direccion
-	; 0800H
+	STA 4800H; Almacena el dato en reg A, en la direccion
+	; 4800H
 	RET
 
 ;--------- Termina INPUT------------
@@ -383,24 +383,24 @@ IN_FF:
 ;---------- Empieza SAVE_RATE ----------
 # org 07C0H
 SAVE_RATE: ;save rate
-    LXI B,588DH ;Carga la primera posicion desde donde se comienzan a leer los digitos a guardar
+    LXI B,188DH ;Carga la primera posicion desde donde se comienzan a leer los digitos a guardar
     MVI A,05H ; Carga en A 05H que es el numero de digitos que se guardaran(con digitos se incluye el ".")
-    STA 581EH ; Guarda en la posicion 581EH el contador de digitos que me indica si ya los copie todos en la tabla o no. 
-    LDA 581FH ; Carga en A el contenido de parte de la posicion donde comenzara a guardarse la tabla
+    STA 181EH ; Guarda en la posicion 181EH el contador de digitos que me indica si ya los copie todos en la tabla o no. 
+    LDA 181FH ; Carga en A el contenido de parte de la posicion donde comenzara a guardarse la tabla
     MOV D,A   ; Mueve la parte de la posicion a D
 
 LOOP_SAVE_RATE:
-    LDA 5820H ; Carga la segunda parte de la posicion donde sera guardada la tabla 
+    LDA 1820H ; Carga la segunda parte de la posicion donde sera guardada la tabla 
     MOV E,A   ; Mueve a E el contenido de A en este punto ya tengo la posicion donde iniciara la tabla( posteriormente se incrementara)
     LDAX B    ; Carga en el acumulador el contenido de la posicion que me la indica BC
     STAX D    ; Guarda el contenido de A en la posicion indicada por DE aqui se guarda lo que estaba en la posicion de memoria BC
     INR E     ; Se incrementa una posicion de la tabla
     MOV A,E   ; Se mueve el valor de E al acumulador para actualizar el valor de la tabla
-    STA 5820H ; Actualiza el valor de la tabla
+    STA 1820H ; Actualiza el valor de la tabla
     INR C     ; Incrementa una posicion de el registro BC para obtener el siguiente digito
-    LDA 581EH ; Se carga el contenido de la posicion 581EH en el acumulador( este es el contador)
+    LDA 181EH ; Se carga el contenido de la posicion 181EH en el acumulador( este es el contador)
     DCR A     ; Decremento en 1 el contador de los digitos
-    STA 581EH ; Guardo el nuevo valor del contador
+    STA 181EH ; Guardo el nuevo valor del contador
     CPI 00H   ; Comparo si el contador es igual a cero
     JNZ LOOP_SAVE_RATE ; Si el contador es diferente a cero salto a la etiqueta LOOP_SAVE_RATE para seguir guardando digitos
     RET
@@ -409,7 +409,7 @@ LOOP_SAVE_RATE:
 ;--------- Empieza ADJUST ----------
 # org 07E9H
 ADJUST:
-    LDA 5869H ; Carga el numero de elementos que hay en el display
+    LDA 1869H ; Carga el numero de elementos que hay en el display
     MOV B,A ; Mueve el numero de elementos en el display a B
     LDA 087EH ; Carga el numero 1
     CMP B ; Compara si lo que esta en B es igual a 1
@@ -428,52 +428,52 @@ ADJUST:
     JZ FIVE_D
 ONE_D: ; Realiza el ajuste de los digitos decimales cuando un solo digito es ingresado EJM 1 se guarda como 01.00
     MVI A,00H
-    STA 5891H
-    STA 5890H
+    STA 1891H
+    STA 1890H
     MVI A,40H
-    STA 588FH
-    LDA 586AH
-    STA 588EH
+    STA 188FH
+    LDA 186AH
+    STA 188EH
     MVI A,00H
-    STA 588DH
+    STA 188DH
     RET
 
 TWO_D: ; Realiza el ajuste de los digitos decimales cuando dos y tres digitos son ingresados EJM 12 se guarda como 12.00
     MVI A,00H
-    STA 5891H
-    STA 5890H
+    STA 1891H
+    STA 1890H
     MVI A,40H
-    STA 588FH
-    LDA 586BH
-    STA 588EH
-    LDA 586AH
-    STA 588DH
+    STA 188FH
+    LDA 186BH
+    STA 188EH
+    LDA 186AH
+    STA 188DH
     RET
 
 FOUR_D: ; Realiza el ajuste de los digitos decimales cuando son ingresados 3 digitos EJM 23.1 se guarda como 23.10
     MVI A,00H
-    STA 5891H
-    LDA 586DH
-    STA 5890H
+    STA 1891H
+    LDA 186DH
+    STA 1890H
     MVI A,40H
-    STA 588FH
-    LDA 586BH
-    STA 588EH
-    LDA 586AH
-    STA 588DH
+    STA 188FH
+    LDA 186BH
+    STA 188EH
+    LDA 186AH
+    STA 188DH
     RET
 
 FIVE_D: ; En este caso no se realiza ajuste solo se guarda el numero completo para tenerlo en una direccion de memoria especifica
-    LDA 586EH
-    STA 5891H
-    LDA 586DH
-    STA 5890H
+    LDA 186EH
+    STA 1891H
+    LDA 186DH
+    STA 1890H
     MVI A,40H
-    STA 588FH
-    LDA 586BH
-    STA 588EH
-    LDA 586AH
-    STA 588DH
+    STA 188FH
+    LDA 186BH
+    STA 188EH
+    LDA 186AH
+    STA 188DH
     RET
 ;---------- Termina ADJUST----------
 
@@ -482,9 +482,9 @@ O_D:
 	RET
 
 ;-----Parte del ADJUST
-#ORG 087EH //Carga posiciones de memoria con digitos contiguos del 1 al 5 para verificar cuantos digitos han sido ingresados
+#ORG 087EH ;Carga posiciones de memoria con digitos contiguos del 1 al 5 para verificar cuantos digitos han sido ingresados
 #DB 01H,02H,03H,04H,05H
 
 ;-----Parte el SAVE_RATE
-#ORG 581FH ;Referencia a la posicion donde se guardaran los digitos
-#DB 58H,00H
+#ORG 181FH ;Referencia a la posicion donde se guardaran los digitos
+#DB 18H,00H
