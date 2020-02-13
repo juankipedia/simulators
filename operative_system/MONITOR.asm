@@ -49,7 +49,9 @@ R_AND_S_T_R: ; read and save table routine (reads edges of graph)
 
 # org 0100H
 R_EXCHANGE_RATE: ; reads exchange rate pointed by register B
-
+    CALL INPUT
+    CALL ADJUST
+    CALL SAVE_RATE
 	; it calls 3 functions OUTPUT_DISPLAY(B), INPUT_RATE(B),  SAVE_RATE(B)
 	RET
 
@@ -321,7 +323,109 @@ IN_FF:
 
 O_D:
 	RET
-SAVE_RATE:
-	RET
+
+;---------- Empieza SAVE_RATE ----------
+# org 07C0H
+SAVE_RATE: ;save rate
+    LXI B,588DH ;Carga la primera posicion desde donde se comienzan a leer los digitos a guardar
+    MVI A,05H ; Carga en A 05H que es el numero de digitos que se guardaran(con digitos se incluye el ".")
+    STA 581EH ; Guarda en la posicion 581EH el contador de digitos que me indica si ya los copie todos en la tabla o no. 
+    LDA 581FH ; Carga en A el contenido de parte de la posicion donde comenzara a guardarse la tabla
+    MOV D,A   ; Mueve la parte de la posicion a D
+
+LOOP_SAVE_RATE:
+    LDA 5820H ; Carga la segunda parte de la posicion donde sera guardada la tabla 
+    MOV E,A   ; Mueve a E el contenido de A en este punto ya tengo la posicion donde iniciara la tabla( posteriormente se incrementara)
+    LDAX B    ; Carga en el acumulador el contenido de la posicion que me la indica BC
+    STAX D    ; Guarda el contenido de A en la posicion indicada por DE aqui se guarda lo que estaba en la posicion de memoria BC
+    INR E     ; Se incrementa una posicion de la tabla
+    MOV A,E   ; Se mueve el valor de E al acumulador para actualizar el valor de la tabla
+    STA 5820H ; Actualiza el valor de la tabla
+    INR C     ; Incrementa una posicion de el registro BC para obtener el siguiente digito
+    LDA 581EH ; Se carga el contenido de la posicion 581EH en el acumulador( este es el contador)
+    DCR A     ; Decremento en 1 el contador de los digitos
+    STA 581EH ; Guardo el nuevo valor del contador
+    CPI 00H   ; Comparo si el contador es igual a cero
+    JNZ LOOP_SAVE_RATE ; Si el contador es diferente a cero salto a la etiqueta LOOP_SAVE_RATE para seguir guardando digitos
+    RET
+;--------- Termina SAVE_RATE------------
+
+;--------- Empieza ADJUST ----------
+# org 07E9H
 ADJUST:
-	RET
+    LDA 5869H ; Carga el numero de elementos que hay en el display
+    MOV B,A ; Mueve el numero de elementos en el display a B
+    LDA 087EH ; Carga el numero 1
+    CMP B ; Compara si lo que esta en B es igual a 1
+    JZ ONE_D
+    LDA 087FH ; Carga el numero 2
+    CMP B ; Compara si lo que esta en B es igual a 2
+    JZ TWO_D
+    LDA 0880H ; Carga el numero 3
+    CMP B ; Compara si lo que esta en B es igual a 3
+    JZ TWO_D
+    LDA 0881H ; Carga el numero 4
+    CMP B ; Compara si lo que esta en B es igual a 4
+    JZ FOUR_D
+    LDA 0882H ; Carga el numero 5 
+    CMP B ; Compara si lo que esta en b es igual a 5
+    JZ FIVE_D
+ONE_D: ; Realiza el ajuste de los digitos decimales cuando un solo digito es ingresado EJM 1 se guarda como 01.00
+    MVI A,00H
+    STA 5891H
+    STA 5890H
+    MVI A,40H
+    STA 588FH
+    LDA 586AH
+    STA 588EH
+    MVI A,00H
+    STA 588DH
+    RET
+
+TWO_D: ; Realiza el ajuste de los digitos decimales cuando dos y tres digitos son ingresados EJM 12 se guarda como 12.00
+    MVI A,00H
+    STA 5891H
+    STA 5890H
+    MVI A,40H
+    STA 588FH
+    LDA 586BH
+    STA 588EH
+    LDA 586AH
+    STA 588DH
+    RET
+
+FOUR_D: ; Realiza el ajuste de los digitos decimales cuando son ingresados 3 digitos EJM 23.1 se guarda como 23.10
+    MVI A,00H
+    STA 5891H
+    LDA 586DH
+    STA 5890H
+    MVI A,40H
+    STA 588FH
+    LDA 586BH
+    STA 588EH
+    LDA 586AH
+    STA 588DH
+    RET
+
+FIVE_D: ; En este caso no se realiza ajuste solo se guarda el numero completo para tenerlo en una direccion de memoria especifica
+    LDA 586EH
+    STA 5891H
+    LDA 586DH
+    STA 5890H
+    MVI A,40H
+    STA 588FH
+    LDA 586BH
+    STA 588EH
+    LDA 586AH
+    STA 588DH
+    RET
+;---------- Termina ADJUST----------
+
+
+;-----Parte del ADJUST
+#ORG 087EH //Carga posiciones de memoria con digitos contiguos del 1 al 5 para verificar cuantos digitos han sido ingresados
+#DB 01H,02H,03H,04H,05H
+
+;-----Parte el SAVE_RATE
+#ORG 581FH ;Referencia a la posicion donde se guardaran los digitos
+#DB 58H,00H
