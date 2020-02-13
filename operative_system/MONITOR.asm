@@ -377,18 +377,16 @@ IN_FF:
 	STA 4800H; Almacena el dato en reg A, en la direccion
 	; 4800H
 	RET
-
 ;--------- Termina INPUT------------
 
+
 ;---------- Empieza SAVE_RATE ----------
-# org 07C0H
 SAVE_RATE: ;save rate
-    LXI B,188DH ;Carga la primera posicion desde donde se comienzan a leer los digitos a guardar
+    LXI B,188CH ;Carga la primera posicion desde donde se comienzan a leer los digitos a guardar
     MVI A,05H ; Carga en A 05H que es el numero de digitos que se guardaran(con digitos se incluye el ".")
     STA 181EH ; Guarda en la posicion 181EH el contador de digitos que me indica si ya los copie todos en la tabla o no. 
     LDA 181FH ; Carga en A el contenido de parte de la posicion donde comenzara a guardarse la tabla
     MOV D,A   ; Mueve la parte de la posicion a D
-
 LOOP_SAVE_RATE:
     LDA 1820H ; Carga la segunda parte de la posicion donde sera guardada la tabla 
     MOV E,A   ; Mueve a E el contenido de A en este punto ya tengo la posicion donde iniciara la tabla( posteriormente se incrementara)
@@ -407,73 +405,69 @@ LOOP_SAVE_RATE:
 ;--------- Termina SAVE_RATE------------
 
 ;--------- Empieza ADJUST ----------
-# org 07E9H
 ADJUST:
     LDA 1869H ; Carga el numero de elementos que hay en el display
     MOV B,A ; Mueve el numero de elementos en el display a B
-    LDA 087EH ; Carga el numero 1
+    LDA 07FBH ; Carga el numero 1
     CMP B ; Compara si lo que esta en B es igual a 1
     JZ ONE_D
-    LDA 087FH ; Carga el numero 2
+    LDA 07FCH ; Carga el numero 2
     CMP B ; Compara si lo que esta en B es igual a 2
     JZ TWO_D
-    LDA 0880H ; Carga el numero 3
+    LDA 07FDH ; Carga el numero 3
     CMP B ; Compara si lo que esta en B es igual a 3
     JZ TWO_D
-    LDA 0881H ; Carga el numero 4
+    LDA 07FEH ; Carga el numero 4
     CMP B ; Compara si lo que esta en B es igual a 4
     JZ FOUR_D
-    LDA 0882H ; Carga el numero 5 
+    LDA 07FFH ; Carga el numero 5 
     CMP B ; Compara si lo que esta en b es igual a 5
     JZ FIVE_D
 ONE_D: ; Realiza el ajuste de los digitos decimales cuando un solo digito es ingresado EJM 1 se guarda como 01.00
     MVI A,00H
-    STA 1891H
     STA 1890H
-    MVI A,40H
     STA 188FH
-    LDA 186AH
+    MVI A,40H
     STA 188EH
-    MVI A,00H
+    LDA 186AH
     STA 188DH
+    MVI A,00H
+    STA 188CH
     RET
-
 TWO_D: ; Realiza el ajuste de los digitos decimales cuando dos y tres digitos son ingresados EJM 12 se guarda como 12.00
     MVI A,00H
-    STA 1891H
     STA 1890H
-    MVI A,40H
     STA 188FH
-    LDA 186BH
+    MVI A,40H
     STA 188EH
+    LDA 186BH
+    STA 188DH  
     LDA 186AH
-    STA 188DH
+    STA 188CH
     RET
-
 FOUR_D: ; Realiza el ajuste de los digitos decimales cuando son ingresados 3 digitos EJM 23.1 se guarda como 23.10
     MVI A,00H
-    STA 1891H
-    LDA 186DH
     STA 1890H
-    MVI A,40H
+    LDA 186DH
     STA 188FH
-    LDA 186BH
+    MVI A,40H
     STA 188EH
-    LDA 186AH
+    LDA 186BH
     STA 188DH
+    LDA 186AH
+    STA 188CH
     RET
-
 FIVE_D: ; En este caso no se realiza ajuste solo se guarda el numero completo para tenerlo en una direccion de memoria especifica
     LDA 186EH
-    STA 1891H
-    LDA 186DH
     STA 1890H
-    MVI A,40H
+    LDA 186DH
     STA 188FH
-    LDA 186BH
+    MVI A,40H
     STA 188EH
-    LDA 186AH
+    LDA 186BH
     STA 188DH
+    LDA 186AH
+    STA 188CH
     RET
 ;---------- Termina ADJUST----------
 
@@ -482,7 +476,7 @@ O_D:
 	RET
 
 ;-----Parte del ADJUST
-#ORG 087EH ;Carga posiciones de memoria con digitos contiguos del 1 al 5 para verificar cuantos digitos han sido ingresados
+#ORG 07FBH ;Carga posiciones de memoria con digitos contiguos del 1 al 5 para verificar cuantos digitos han sido ingresados
 #DB 01H,02H,03H,04H,05H
 
 ;-----Parte el SAVE_RATE
