@@ -70,22 +70,13 @@ D_KEYBOARD:
 KB_IN: ;keyboard interrupt function
 	JMP 0184H; jumps to E_KEYBOARD RET instruction
 
+;---------- Empieza INPUT ----------
 # org 01C3H
-	; Prueba push/pop
-	;MVI B,01H
-	;MVI C,02H
-	;MVI D,03H
-	;MVI E,04H
 INPUT:
 
-	PUSH B;Se guarda preventivamente el dato que
-	;contenga el registro B y C
-	PUSH D;Se guarda preventivamente el dato que
-	;contenga el registro D y E
+	CALL S_INIT; Se inicia la simulacion
 
-	CALL S_INIT; iniciar simulacion
-
-	CALL E_KEYBOARD; habilita el KEYBOARD
+	CALL E_KEYBOARD; Se habilita el KEYBOARD
 
 	; Se incia un bucle que solo termina cuando se activa la
 	; interrupcion R75
@@ -93,7 +84,7 @@ INPUT:
 	; Es el momento propicio para simular la entrada de
 	; caracteres al FIFO del 8279
 	; Agrega en los puertos F8H al FFH los caracteres deseados
-	; en orden
+	; en orden left-right
 
 	CALL D_KEYBOARD; Se deshabilita el keyboard
 	
@@ -105,25 +96,26 @@ INPUT:
 	CALL SAVE_NC_RAM;guarda el numero de caracteres en
 	; RAM
 
-	; Se comprueba si hay caracteresen FIFO
+	; Se comprueba si hay caracteres en FIFO
 	; en caso no haber finaliza INPUT
 	MOV A,B
+	
 	CPI 00H
+
+	; Si no hay caracteres en FIFO (reg A = reg B = 0)
+	; Se salta al final de esta rutina (INPUT)
 	JZ END_LOOP
 
-	CALL S_INIT_PORT_COUNTER; inicia el contador de puertos
+	CALL S_INIT_PORT_POINTER
+	; inicia el puntero de puertos
 	; usado para la simulacion de la entrada de un caracter
 
 	;Bucle que hace la lectura de todos los
-	;caracteres que esten en la FIFO, segun el nuemro de 
+	;caracteres que esten en la FIFO, segun el nuemero de 
 	;caracteres
 	CALL INPUT_LOOP
 
 END_LOOP:	
-	POP D;Se recupera los datos almacenados
-	;preventivamente de los regs D Y E
-	POP B;Se recupera los datos almacenados
-	;preventivamente de los regs B y C
 	RET
 
 INPUT_LOOP:
@@ -159,48 +151,77 @@ GET_NUMBER_C:
 SAVE_NC_RAM:
 	;Saves number of characters in FIFO on 5869H RAM
 	;and load D and E regs with data 5869H
-	MOV A,B
+
+	; Cuando  se llama a esta rutina en el reg B se debe
+	; enecontrar
+	; el numero de caracteres que hay en FIFO 
+
+	MOV A,B; El valor del reg B se pasa al reg A
 	STA 5869H; Guarda en la direccion RAM 5869H
 		;el numero de caracteres en FIFO (reg A)
 	LXI D, 586AH;Carga la direccion 586AH en los regs D y E
 		;por ser la direccion donde se comensaran
-		;a guardar los datos leidos del 8279
+		;a guardar los caracteres leidos del 8279
 	RET
 
-S_INIT: ; Iniciar simulacion
-	; incia todos los puertos (F8H al FFH) usados para la
-	; simulacion en FFH
-	MVI A, FFH
-	OUT F8H
-	OUT F9H
-	OUT FAH
-	OUT FBH
-	OUT FCH
-	OUT FDH
-	OUT FEH
-	OUT FFH
+S_INIT: ; Inicia la simulacion
+	; Se inician todos los puertos (del F8H al FFH) usados
+	; para la simulacion, con el FFh
+
+	; Nota: Los puertos del F8H al FFh simulan la FIFO
+	; del 8279
+	; El valor FFh se usa como indicativo de vacio
+
+	MVI A, FFH ; Cargar en el registro A el valor FFH
+	OUT F8H ; Envia al puerto F8H el valor FFH
+	OUT F9H ; Envia al puerto F9H el valor FFH
+	OUT FAH ; Envia al puerto FAH el valor FFH
+	OUT FBH ; Envia al puerto FBH el valor FFH
+	OUT FCH ; Envia al puerto FCH el valor FFH
+	OUT FDH ; Envia al puerto FDH el valor FFH
+	OUT FEH ; Envia al puerto FEH el valor FFH
+	OUT FFH ; Envia al puerto FFH el valor FFH
 	RET
 
-S_INIT_PORT_COUNTER:; Se inicia el contador de puertos usados para
-	; la simulacion
-	MVI C, F7H; inicia el contador en F7H 
+S_INIT_PORT_POINTER:; Se inicia el puntero que indica el
+	; el puerto que se leera cada vez que se simula
+	; la entrada de un caracter con la rutina S_KEY_ENTRY
+
+	
+	; Se usara el reg C para llevar el estado del puntero
+	MVI C, F7H; Inicia el puntero en F7H 
+	; Se inicia en F7H para que en la primera iteracion
+	; la rutina S_KEY_ENTRY establezca el puntero en
+	; F8H que es el puerto real de inicio
 	RET
 
 S_NUMBER_C:; Simula la entrada de word-status
 	; contando el numero de puertos entre F8H y FFH
-	; en los que se ha ingreado un dato diferente de FFH
-	;PUSH B
-	MVI C, 00H; el reg C es usado para contar
+	; en los que se ha ingresado un dato diferente de FFH
+
+	MVI C, 00H; el reg C es usado para contar y se inicia
+	; en 00H
 
 	IN F8H; hace una lectura del puerto XXH cuyo valor se
 	; guarda en el reg A
+
 	CPI FFH; compara el reg A con el valor FFH
+
+	; Si A igual FFH, la bandera Z se pone en 1
+	; Lo que indica que no hay mas caracteres en FIFO
+	; Se deja de contar y se salta al final de la rutina
+	; donde se almacena la informacion del contador
 	JZ S_NUMBER_C_R
-	;Si la comparacion es positiva la bandera Z se pone en 1
-	; indicando que no hay mas caracteres en FIFO
-	; (simulacion)
-	INR C; en caso contrario, se incrementa C y se analiza el
-	; siguiente puerto
+
+	; en caso contrario, se incrementa C
+	INR C 
+
+	;Se analiza el siguiente puerto
+	
+	; Nota: la descripcion de lo que se hizo con el
+	; puerto F8H es analoga a lo que se hace con los
+	; puertos  F9H, FAH, FBH, FCH, FDH, FEH y FFH
+	; a continuacion
 
 	IN F9H
 	CPI FFH
@@ -238,17 +259,48 @@ S_NUMBER_C:; Simula la entrada de word-status
 	INR C
 
 S_NUMBER_C_R:
+
+	; En este punto el reg C contiene la informacion
+	; de cuantos caracteres hay en FIFO
+
 	MOV A,C; el numero de caracteres en reg C se pasan al
 	; regA
 	STA 0800H;SE almacena reg A en la direccion 0800H
+	; Creando la simulacion, pues seguidamente se llamara
+	; a las rutinas que leen el status-word del FIFO del 8279
 	
 	RET
-S_KEY_ENTRY: ; Simular la entrada de un caracter
-	INR C
-	MOV A,C
 
-	CPI F8H
+S_KEY_ENTRY: ; Simula la entrada de un caracter
+	
+	; El registro C es usado como puntero que indica
+	; cual es el puerto que se debe leer
+	; Donde el puerto simula la entrada de un caracter	
+
+	INR C ; Se incrementa el registro C
+	; Para posicionarse en el puerto que toca ya que se
+	; esta simulando la lectura del FIFO del 8279, y en
+	; consecuencia es una lectura secuencial
+
+	MOV A,C; El valor del reg C se lleva al reg A
+	; para poder hacer una comparacion directa
+
+	CPI F8H; Si a igual F8H indica que el puntero C
+	; esta apuntado al purto F8H y en consecuencia se
+	; lee dicho puerto saltando a la rutina que realiza
+	; esa accion que es IN_F8
 	CZ IN_F8
+	; Esta rutina (S_KEY_ENTRY) solo lee un puerto a la
+	; vez, en consecuencia una vez se lee un puerto,
+	; las subsiguientes comparaciones fallaran
+
+	; En caso de que la comparacion falle, se sigue
+	; comparando con los siguientes puertos
+
+	; Nota: la descripcion de lo que se hizo con el
+	; puerto F8H es analoga a lo que se hace con los
+	; puertos  F9H, FAH, FBH, FCH, FDH, FEH y FFH
+	; a continuacion
 
 	CPI F9H
 	CZ IN_F9
@@ -277,6 +329,11 @@ IN_F8:
 	;Se almacena en el reg A
 	STA 0800H; Almacena el dato en reg A, en la direccion
 	; 0800H
+
+	;Nota: La razon por la que se almacena en la direccion
+	; de memoria 0800H, es porque esto es una simulacion
+	; de la entrada de un caracter, y el monitor seguidamente
+	; a esta rutina leera el caracter en la direcion 0800H
 	RET
 IN_F9:
 	IN F9H; Lee un dato por el puerto F9H
@@ -321,8 +378,7 @@ IN_FF:
 	; 0800H
 	RET
 
-O_D:
-	RET
+;--------- Termina INPUT------------
 
 ;---------- Empieza SAVE_RATE ----------
 # org 07C0H
@@ -421,6 +477,9 @@ FIVE_D: ; En este caso no se realiza ajuste solo se guarda el numero completo pa
     RET
 ;---------- Termina ADJUST----------
 
+
+O_D:
+	RET
 
 ;-----Parte del ADJUST
 #ORG 087EH //Carga posiciones de memoria con digitos contiguos del 1 al 5 para verificar cuantos digitos han sido ingresados
