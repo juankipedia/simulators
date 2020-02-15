@@ -1,11 +1,12 @@
-JMP INIT
+.ORG 0000H
+JMP INIT_MAIN
 
-# org 003CH
+.ORG 003CH
 JMP KB_IN; sets 7 point 5 Interrupt Service Routine
 
 
-# org 0040H
-INIT : ; inits interrupts and devices
+.ORG 0040H
+INIT_MAIN: ; inits interrupts and devices
 	LXI SP, 1868H; sets stack pointer memory location 
 	MVI A,04H; prepare the mask to enable 7 poitn 5 interrupt
 	SIM; apply the settings RTS masks
@@ -19,21 +20,19 @@ R_AND_S_T: ; read and save table
 	CALL R_AND_S_T_R; calls read and save table routine
 
 
-LOOP: ; main loop
+LOOP_MAIN: ; main loop
 	CALL PROGRAM; calls main program
-	JMP LOOP
+	JMP LOOP_MAIN
 
-# org 0080H
 PROGRAM: ; main program routine
 	;output result of the program
   	RET
 
-# org 00C0H
 R_AND_S_T_R: ; read and save table routine (reads edges of graph)
 	MVI B, 00H; sets register B to 0 pointing to first exchange rate
-	MVI A, 06H; sets register A with upper bound of B (n * n) - n
+A_INIT:	MVI A, 06H; sets register A with upper bound of B (n * n) - n
 	CMP B; if B == 6
-	JZ 00D7H; if B == 6 then jump to R_AND_S_T_R RET
+	JZ RET_R_AND_S_T_R; if B == 6 then jump to R_AND_S_T_R RET
 
 	LXI H, 1822H; direction where register B will be saved before calling the function
 	MOV M,B; save the register
@@ -44,10 +43,9 @@ R_AND_S_T_R: ; read and save table routine (reads edges of graph)
 	MOV B,M; restore register B
 
 	INR B; B += 1
-	JMP 00C2H;  jumps to if A = 6
-  	RET
+	JMP A_INIT;  jumps to if A = 6
+RET_R_AND_S_T_R: 	RET
 
-# org 0100H
 R_EXCHANGE_RATE: ; reads exchange rate pointed by register B
     CALL INPUT
     CALL ADJUST
@@ -55,23 +53,21 @@ R_EXCHANGE_RATE: ; reads exchange rate pointed by register B
 	; it calls 3 functions OUTPUT_DISPLAY(B), INPUT_RATE(B),  SAVE_RATE(B)
 	RET
 
-# org 0180H
 E_KEYBOARD: ;enables keyboard by EI, and waits until key is pressed
 	EI; enables keyboard interrupts
 LOOP_EK: 	JMP LOOP_EK; waits until keyboard interrupts 
-	RET
+E_KEYBOARD_RET:	RET
 
-# org 0185H
 D_KEYBOARD:
 	DI; disables keyboard interrupts
 	RET
 
-# org 01C0H
 KB_IN: ;keyboard interrupt function
-	JMP 0184H; jumps to E_KEYBOARD RET instruction
+	POP H;
+	JMP E_KEYBOARD_RET; jumps to E_KEYBOARD RET instruction
 
 ;---------- Empieza INPUT ----------
-# org 01C3H
+.ORG 01C3H
 INPUT:
 
 	CALL S_INIT; Se inicia la simulacion
@@ -475,14 +471,6 @@ FIVE_D: ; En este caso no se realiza ajuste solo se guarda el numero completo pa
 O_D:
 	RET
 
-;-----Parte del ADJUST
-#ORG 07FBH ;Carga posiciones de memoria con digitos contiguos del 1 al 5 para verificar cuantos digitos han sido ingresados
-#DB 01H,02H,03H,04H,05H
-
-;-----Parte el SAVE_RATE
-#ORG 181FH ;Referencia a la posicion donde se guardaran los digitos
-#DB 18H,00H
-
 MULTIPLY:
 
     CALL PREPARE_MULT
@@ -512,111 +500,111 @@ PREPARE_MULT:
     RET
 
 MAIN_MULT: ;Indica que digitos se deben multiplicar.
-        LDA 18A3H // Primera parte de la Posicion del digito a multiplicar que esta dada x la direccion 18
-        MOV B,A  //B es 18
-        LDA 18A4H // Segunda parte de la posicion del digito a multiplicar (puede ser 00H,01H,02H,03H)
-        MOV C,A // C ahora tiene la segunda parte que me indica la posicion donde esta guardado el digito.
-        LDAX B // Carga la informacion de la posicion dada por el registro par BC primer digito a multiplicar
-        STA 18D2H // Guarda la informacion en la posicion 2505 dicha posicion es la del multiplicando
-        LDA 18A5H // Carga la informacion de la posicion 80H en este caso
-        MOV D,A // Mueve la primera parte de la posicion a D
-        LDA 18A6H // Carga la segunda parte de la posicion en el acumulador
-        MOV E,A // Mueve a E la segunda parte de la posicion del multiplicador
-        LDAX D // Carga en el acumulador el digito correspondiente al multiplicador
-        STA 18D3H // Guarda en la posicion dada el multiplicador
-        INR C // Incremento el registro C para obtener en el ciclo siguiente el numero a multiplicar
-        MOV A,C // Muevo la posicion incrementada del multiplicando
-        STA 18A4H // Guardo la nueva posicion del muktiplicando
-        //HLT // Salta a la rutina de multiplicar
+        LDA 18A3H ; Primera parte de la Posicion del digito a multiplicar que esta dada x la direccion 18
+        MOV B,A  ;B es 18
+        LDA 18A4H ; Segunda parte de la posicion del digito a multiplicar (puede ser 00H,01H,02H,03H)
+        MOV C,A ; C ahora tiene la segunda parte que me indica la posicion donde esta guardado el digito.
+        LDAX B ; Carga la informacion de la posicion dada por el registro par BC primer digito a multiplicar
+        STA 18D2H ; Guarda la informacion en la posicion 2505 dicha posicion es la del multiplicando
+        LDA 18A5H ; Carga la informacion de la posicion 80H en este caso
+        MOV D,A ; Mueve la primera parte de la posicion a D
+        LDA 18A6H ; Carga la segunda parte de la posicion en el acumulador
+        MOV E,A ; Mueve a E la segunda parte de la posicion del multiplicador
+        LDAX D ; Carga en el acumulador el digito correspondiente al multiplicador
+        STA 18D3H ; Guarda en la posicion dada el multiplicador
+        INR C ; Incremento el registro C para obtener en el ciclo siguiente el numero a multiplicar
+        MOV A,C ; Muevo la posicion incrementada del multiplicando
+        STA 18A4H ; Guardo la nueva posicion del muktiplicando
+        ;HLT ; Salta a la rutina de multiplicar
         JMP START 
 START:
-	    LHLD 18D2H // Se carga a H y L con cada digito
-	    MOV B,H // Se mueve el digito de H a B 
-	    MVI A,00H // Se coloca el acumulador en cero
-	    CMP B // Se compara si B es cero 
-	    JZ ASSIGN // Si B es cero se realiza de una vez la asignacion
-	    MOV C,L // Se mueve el digito de L a C
-	    CMP C // Se compara si C es cero
-	    JZ ASSIGN // Si C es cero se asigna de una vez el valor
-	    MOV A,L // Se mueve el digito de L al acumulador
+	    LHLD 18D2H ; Se carga a H y L con cada digito
+	    MOV B,H ; Se mueve el digito de H a B 
+	    MVI A,00H ; Se coloca el acumulador en cero
+	    CMP B ; Se compara si B es cero 
+	    JZ ASSIGN ; Si B es cero se realiza de una vez la asignacion
+	    MOV C,L ; Se mueve el digito de L a C
+	    CMP C ; Se compara si C es cero
+	    JZ ASSIGN ; Si C es cero se asigna de una vez el valor
+	    MOV A,L ; Se mueve el digito de L al acumulador
 LOOP:
-	    DCR B // Se decrementa B en uno
-	    JZ ASSIGN // si B ya es cero se asigna el valor
-	    ADD L // Se Suma L + L
-	    DAA // Se hace un ajuste decimal 
-	    JMP LOOP // Se llama de nuevo a la etiqueta loop 
-ASSIGN: // Hasta aqui calula el valor de la multiplicacion que esta guardado en un registro, se guarda con este 
-//formato por ejemplo el numero 81.
-	    STA 18D4H // Guarda el valor calculado en la posicion    
+	    DCR B ; Se decrementa B en uno
+	    JZ ASSIGN ; si B ya es cero se asigna el valor
+	    ADD L ; Se Suma L + L
+	    DAA ; Se hace un ajuste decimal 
+	    JMP LOOP ; Se llama de nuevo a la etiqueta loop 
+ASSIGN: ; Hasta aqui calula el valor de la multiplicacion que esta guardado en un registro, se guarda con este 
+;formato por ejemplo el numero 81.
+	    STA 18D4H ; Guarda el valor calculado en la posicion    
         MVI L,01H
         LDA 18D4H
         STA 18CDH
 	    JMP START_S
 MAIN:
-	    DCR L // Decrementa el registro L para hacer el segundo salto a la etiqueta START_S
-	    JZ START_S // comienza a realizar el calculo de los digitos
+	    DCR L ; Decrementa el registro L para hacer el segundo salto a la etiqueta START_S
+	    JZ START_S ; comienza a realizar el calculo de los digitos
         JMP OPER_M
         RET
-	    //HLT // Se detiene una vez calculados los dos digitos
+	    ;HLT ; Se detiene una vez calculados los dos digitos
 START_S:
-	    LDA 18CDH // Carga el numero que esta gardado en esa direccion al acumulador 
-	    MVI B, 04H // Se coloca en 4 par contar cantidad de bits desplazados
-	    MVI C, 00H// En este registro se guardara el resultado
-	    MVI H,00H// Se usa como auxiliar para ir guardadndo el resultado actual de A
-	    LXI D,18D1H // Posiciones donde estan guardados los valores de cada bit recorrido
-	//JMP GETNUM 
-GETNUM: // Mueve los bits hacia la izquierda verificando si alguno es 1
-	    RLC // Mueve a la izquierda un bit
-	    JC SUM_NEW // Si hay un bit que no es cero salto a SUM
-	    DCX D // Decremento el valor de la tabla de bits
-	    DCR B // Decremento el valor de los bits recorridos
-	    JNZ GETNUM // Si B aun no es cero salto a GETNUM
-	    MOV H,A // Guardo el ultimo valor en H
-	    JMP ASSIGN_VALUE // Salto para asignar el valor ya calculado
+	    LDA 18CDH ; Carga el numero que esta gardado en esa direccion al acumulador 
+	    MVI B, 04H ; Se coloca en 4 par contar cantidad de bits desplazados
+	    MVI C, 00H; En este registro se guardara el resultado
+	    MVI H,00H; Se usa como auxiliar para ir guardadndo el resultado actual de A
+	    LXI D,18D1H ; Posiciones donde estan guardados los valores de cada bit recorrido
+	;JMP GETNUM 
+GETNUM: ; Mueve los bits hacia la izquierda verificando si alguno es 1
+	    RLC ; Mueve a la izquierda un bit
+	    JC SUM_NEW ; Si hay un bit que no es cero salto a SUM
+	    DCX D ; Decremento el valor de la tabla de bits
+	    DCR B ; Decremento el valor de los bits recorridos
+	    JNZ GETNUM ; Si B aun no es cero salto a GETNUM
+	    MOV H,A ; Guardo el ultimo valor en H
+	    JMP ASSIGN_VALUE ; Salto para asignar el valor ya calculado
 
-SUM_NEW:	// Suma el valor correspondiente al digito en caso de que sea 1
-	    MOV H,A //cargoo el valor actual de A en H
-	    LDAX D // Cargo el valor del bit en A
-	    ADD C // Sumo el valor del bit con el resultado hasta ahora
-	    MOV C,A // Cargoo el valor de la suma en C 
-	    MOV A,H // Cargo el valor obtenido al desplazar el bit
-	    DCX D // Decremento el valor de la tabla de bits
-	    DCR B // Decremento  el valor de los bits recorrido
-	    JNZ GETNUM // Si aun no he recorrido todos los bit regreso a getnum
-	    JMP ASSIGN_VALUE // SI ya recorrio todos los bits asigno valor 
+SUM_NEW:	; Suma el valor correspondiente al digito en caso de que sea 1
+	    MOV H,A ;cargoo el valor actual de A en H
+	    LDAX D ; Cargo el valor del bit en A
+	    ADD C ; Sumo el valor del bit con el resultado hasta ahora
+	    MOV C,A ; Cargoo el valor de la suma en C 
+	    MOV A,H ; Cargo el valor obtenido al desplazar el bit
+	    DCX D ; Decremento el valor de la tabla de bits
+	    DCR B ; Decremento  el valor de los bits recorrido
+	    JNZ GETNUM ; Si aun no he recorrido todos los bit regreso a getnum
+	    JMP ASSIGN_VALUE ; SI ya recorrio todos los bits asigno valor 
 ASSIGN_VALUE:
-        LDA 18A9H // Carga el contenido de 18A9H en A esta es la primera parte de la direccion
-        MOV D,A // Primera parte de la posicion donde sera guardado el digito obtenido.
-        LDA 18AAH // Carga el contenido de 18AAH en A esta es la segunda parte de la direccion
-        MOV E,A // Segunda parte de la posicion donde sera guardado el digito obtenido.
-        MOV A,C // Carga en A el resultado que se encuenta en C
-	    STAX D // Guarda el resultado en la posicion de memoria dada por DE 400XH
-	    MOV A,H // Carga en A el valor actual obtenido de desplazar los digitos, 
-		//es decir el valor necesario para separar el siguiente digito
-	    STA 18CDH // Guarda en la posicion dada el nuevo numero obtenido de desplazar los digitos
-        LDA 18AAH // Carga la segunda parte de la posicion donde se guardara el digito para incrementarla
-        INR A // Incrementa la posicion en 1
+        LDA 18A9H ; Carga el contenido de 18A9H en A esta es la primera parte de la direccion
+        MOV D,A ; Primera parte de la posicion donde sera guardado el digito obtenido.
+        LDA 18AAH ; Carga el contenido de 18AAH en A esta es la segunda parte de la direccion
+        MOV E,A ; Segunda parte de la posicion donde sera guardado el digito obtenido.
+        MOV A,C ; Carga en A el resultado que se encuenta en C
+	    STAX D ; Guarda el resultado en la posicion de memoria dada por DE 400XH
+	    MOV A,H ; Carga en A el valor actual obtenido de desplazar los digitos, 
+		;es decir el valor necesario para separar el siguiente digito
+	    STA 18CDH ; Guarda en la posicion dada el nuevo numero obtenido de desplazar los digitos
+        LDA 18AAH ; Carga la segunda parte de la posicion donde se guardara el digito para incrementarla
+        INR A ; Incrementa la posicion en 1
         MOV E,A
-        STA 18AAH // Incrementa la posicion donde se guardara para que en el siguiente ciclo se guarde en la posicion sgte.
-        //STAX D
-	    JMP MAIN//Salto a la etiqueta main para separar siguiente digito
-OPER_M: // Realiza un retorno para multiplicar los digitos que correspondan.
-        LDA 18A8H // Contador de multiplicador
-        DCR A // Decrementa el valor en 1
-        CPI 00H // Compara si ya llego a cero
-        STA 18A8H // Guarda el nuevo valor 
-        JNZ MAIN_MULT // Si no es cero salta a MAIN_MULT
+        STA 18AAH ; Incrementa la posicion donde se guardara para que en el siguiente ciclo se guarde en la posicion sgte.
+        ;STAX D
+	    JMP MAIN;Salto a la etiqueta main para separar siguiente digito
+OPER_M: ; Realiza un retorno para multiplicar los digitos que correspondan.
+        LDA 18A8H ; Contador de multiplicador
+        DCR A ; Decrementa el valor en 1
+        CPI 00H ; Compara si ya llego a cero
+        STA 18A8H ; Guarda el nuevo valor 
+        JNZ MAIN_MULT ; Si no es cero salta a MAIN_MULT
 		MVI A,04H 
-		STA 18A8H // Coloca nuevamente en 4 el valor del Contador
+		STA 18A8H ; Coloca nuevamente en 4 el valor del Contador
 		MVI A,9BH
-		STA 18A4H // Coloca en la posicion cero la referencia del multiplicando
-		LDA 18A6H // Toma el valor de referencia de la posicion donde estara el multiplicador
+		STA 18A4H ; Coloca en la posicion cero la referencia del multiplicando
+		LDA 18A6H ; Toma el valor de referencia de la posicion donde estara el multiplicador
 		ADI 01H 
-		STA 18A6H // Aumenta en 1 la referencia de la posicion del multiplicador
-		LDA 18A7H // Carga el valor del contador del multiplicando 
+		STA 18A6H ; Aumenta en 1 la referencia de la posicion del multiplicador
+		LDA 18A7H ; Carga el valor del contador del multiplicando 
 		DCR A
 		CPI 00H
-		STA 18A7H // Decrementa el valor del multiplicando.
+		STA 18A7H ; Decrementa el valor del multiplicando.
 		JNZ MAIN_MULT
         RET
 
@@ -965,37 +953,45 @@ TRUNC:
 
 ;------- Parte del MainMult -------
 ;Guarda la posicion donde se tendra la direccion donde estara el digito que se multiplicara
-#ORG 18A3H
-#DB 18,9BH,18H,9FH
+.DATA 18A3H
+DB 18,9BH,18H,9FH
 
-#ORG 18A7H ;Contadores del multiplicando y multiplicador respectivamente
-#DB 04H,04H
+.DATA 18A7H ;Contadores del multiplicando y multiplicador respectivamente
+DB 04H,04H
 
 ;Direccion donde sera guardado el resulta de la multiplicacion separado en digitos
-#ORG 18A9H
-#DB 18H,ABH
+.DATA 18A9H
+DB 18H,ABH
 
 ;Tabla auxiliar para la conversion de binario a decimal
-#ORG 18CDH
-#DB 00H,01H,02H,04H,08H
+.DATA 18CDH
+DB 00H,01H,02H,04H,08H
 
 
 ;------- Parte del DigitsMult --------
-#ORG 18D5H   ;Posicion que referencia a una posicion de la tabla 
-#DB ABH,18H
+.DATA 18D5H   ;Posicion que referencia a una posicion de la tabla 
+DB ABH,18H
 
-#ORG 18D7H ;Referencia a la posicion donde se van guardando
-#DB D9H,18H
+.DATA 18D7H ;Referencia a la posicion donde se van guardando
+DB D9H,18H
 
-#ORG 07F0H ;Auxiliar para separacion esto va en ROM
-#DB 01H,02H,04H,08H
+.DATA 07F0H ;Auxiliar para separacion esto va en ROM
+DB 01H,02H,04H,08H
 
-#ORG 18F9H ;Contador para separar
-#DB 01H
+.DATA 18F9H ;Contador para separar
+DB 01H
 
-#ORG 18FEH 
-#DB 02H,03H ;Contador interno, Contador externo
+.DATA 18FEH 
+DB 02H,03H ;Contador interno, Contador externo
 
 
-# ORG 07F4H
-# DB 02H, 03H, 04H, 05H, 06H, 07H, 08H
+.DATA 07F4H
+DB 02H, 03H, 04H, 05H, 06H, 07H, 08H
+
+;-----Parte del ADJUST
+.DATA 07FBH ;Carga posiciones de memoria con digitos contiguos del 1 al 5 para verificar cuantos digitos han sido ingresados
+DB 01H,02H,03H,04H,05H
+
+;-----Parte el SAVE_RATE
+.DATA 181FH ;Referencia a la posicion donde se guardaran los digitos
+DB 18H,00H
