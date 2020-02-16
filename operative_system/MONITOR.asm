@@ -492,29 +492,29 @@ PREPARE_MULT:
     LDA 189AH
     STA 189FH
     LDA 1899H
-    STA 18A0H
+    STA 18a0H
     LDA 1897H
-    STA 18A1H
+    STA 18a1H
     LDA 1896H
-    STA 18A2H
+    STA 18a2H
     RET
 
 MAIN_MULT: ;Indica que digitos se deben multiplicar.
-        LDA 18A3H ; Primera parte de la Posicion del digito a multiplicar que esta dada x la direccion 18
+        LDA 18a3H ; Primera parte de la Posicion del digito a multiplicar que esta dada x la direccion 18
         MOV B,A  ;B es 18
-        LDA 18A4H ; Segunda parte de la posicion del digito a multiplicar (puede ser 00H,01H,02H,03H)
+        LDA 18a4H ; Segunda parte de la posicion del digito a multiplicar (puede ser 00H,01H,02H,03H)
         MOV C,A ; C ahora tiene la segunda parte que me indica la posicion donde esta guardado el digito.
         LDAX B ; Carga la informacion de la posicion dada por el registro par BC primer digito a multiplicar
         STA 18D2H ; Guarda la informacion en la posicion 2505 dicha posicion es la del multiplicando
-        LDA 18A5H ; Carga la informacion de la posicion 80H en este caso
+        LDA 18a5H ; Carga la informacion de la posicion 80H en este caso
         MOV D,A ; Mueve la primera parte de la posicion a D
-        LDA 18A6H ; Carga la segunda parte de la posicion en el acumulador
+        LDA 18a6H ; Carga la segunda parte de la posicion en el acumulador
         MOV E,A ; Mueve a E la segunda parte de la posicion del multiplicador
         LDAX D ; Carga en el acumulador el digito correspondiente al multiplicador
         STA 18D3H ; Guarda en la posicion dada el multiplicador
         INR C ; Incremento el registro C para obtener en el ciclo siguiente el numero a multiplicar
         MOV A,C ; Muevo la posicion incrementada del multiplicando
-        STA 18A4H ; Guardo la nueva posicion del muktiplicando
+        STA 18a4H ; Guardo la nueva posicion del muktiplicando
         ;HLT ; Salta a la rutina de multiplicar
         JMP START 
 START:
@@ -573,44 +573,44 @@ SUM_NEW:	; Suma el valor correspondiente al digito en caso de que sea 1
 	    JNZ GETNUM ; Si aun no he recorrido todos los bit regreso a getnum
 	    JMP ASSIGN_VALUE ; SI ya recorrio todos los bits asigno valor 
 ASSIGN_VALUE:
-        LDA 18A9H ; Carga el contenido de 18A9H en A esta es la primera parte de la direccion
+        LDA 18a9H ; Carga el contenido de 18a9H en A esta es la primera parte de la direccion
         MOV D,A ; Primera parte de la posicion donde sera guardado el digito obtenido.
-        LDA 18AAH ; Carga el contenido de 18AAH en A esta es la segunda parte de la direccion
+        LDA 18aaH ; Carga el contenido de 18aaH en A esta es la segunda parte de la direccion
         MOV E,A ; Segunda parte de la posicion donde sera guardado el digito obtenido.
         MOV A,C ; Carga en A el resultado que se encuenta en C
 	    STAX D ; Guarda el resultado en la posicion de memoria dada por DE 400XH
 	    MOV A,H ; Carga en A el valor actual obtenido de desplazar los digitos, 
 		;es decir el valor necesario para separar el siguiente digito
 	    STA 18CDH ; Guarda en la posicion dada el nuevo numero obtenido de desplazar los digitos
-        LDA 18AAH ; Carga la segunda parte de la posicion donde se guardara el digito para incrementarla
+        LDA 18aaH ; Carga la segunda parte de la posicion donde se guardara el digito para incrementarla
         INR A ; Incrementa la posicion en 1
         MOV E,A
-        STA 18AAH ; Incrementa la posicion donde se guardara para que en el siguiente ciclo se guarde en la posicion sgte.
+        STA 18aaH ; Incrementa la posicion donde se guardara para que en el siguiente ciclo se guarde en la posicion sgte.
         ;STAX D
 	    JMP MAIN;Salto a la etiqueta main para separar siguiente digito
 OPER_M: ; Realiza un retorno para multiplicar los digitos que correspondan.
-        LDA 18A8H ; Contador de multiplicador
+        LDA 18a8H ; Contador de multiplicador
         DCR A ; Decrementa el valor en 1
         CPI 00H ; Compara si ya llego a cero
-        STA 18A8H ; Guarda el nuevo valor 
+        STA 18a8H ; Guarda el nuevo valor 
         JNZ MAIN_MULT ; Si no es cero salta a MAIN_MULT
 		MVI A,04H 
-		STA 18A8H ; Coloca nuevamente en 4 el valor del Contador
+		STA 18a8H ; Coloca nuevamente en 4 el valor del Contador
 		MVI A,9BH
-		STA 18A4H ; Coloca en la posicion cero la referencia del multiplicando
-		LDA 18A6H ; Toma el valor de referencia de la posicion donde estara el multiplicador
+		STA 18a4H ; Coloca en la posicion cero la referencia del multiplicando
+		LDA 18a6H ; Toma el valor de referencia de la posicion donde estara el multiplicador
 		ADI 01H 
-		STA 18A6H ; Aumenta en 1 la referencia de la posicion del multiplicador
-		LDA 18A7H ; Carga el valor del contador del multiplicando 
+		STA 18a6H ; Aumenta en 1 la referencia de la posicion del multiplicador
+		LDA 18a7H ; Carga el valor del contador del multiplicando 
 		DCR A
 		CPI 00H
-		STA 18A7H ; Decrementa el valor del multiplicando.
+		STA 18a7H ; Decrementa el valor del multiplicando.
 		JNZ MAIN_MULT
         RET
 
 INITIAL_POINT:
     MVI A,03H
-    STA 18A2H ;Referencia al numero que sigue luego de separar
+    STA 18a2H ;Referencia al numero que sigue luego de separar
 
 START_POINT:
     MVI A,00H
@@ -700,9 +700,9 @@ IS_NOT_ZERO:
     DAA
     MOV D,A
     DCR L
-    LDA 18A2H
+    LDA 18a2H
     DCR A
-    STA 18A2H
+    STA 18a2H
     MOV A,E
     JM SECOND_DIGIT
     JMP SEPARATE
@@ -710,9 +710,9 @@ IS_NOT_ZERO:
 IS_ZERO:
     MOV E,A
     DCR L
-    LDA 18A2H
+    LDA 18a2H
     DCR A
-    STA 18A2H
+    STA 18a2H
     MOV A,E
     JM SECOND_DIGIT
     JMP SEPARATE
@@ -729,26 +729,26 @@ SECOND_DIGIT:
     MVI H,07H
     MVI L,F3H
     MVI A,03H
-    STA 18A2H
+    STA 18a2H
     MOV A,E
     JMP SEPARATE
 DONE:
     MVI A,01H
     STA 18F9H
     MVI A,03H
-    STA 18A2H
+    STA 18a2H
     RET
 
 INIT_:	
 	XRA A ;LIMPIAR ACUMULADOR
-	LXI H,18ABH ;POSICION INICIAL DE DONDE SE GUARDA EL RESULTADO (9070H-9077H)
+	LXI H,18aBH ;POSICION INICIAL DE DONDE SE GUARDA EL RESULTADO (9070H-9077H)
 	LXI D,189BH ;POSICION AUXILIAR PARA GUARDAR LOS CARRY GENERADOS POR LAS OPERACIONES PARA CADA NUMERO
 A0: ;A0 = 18D9H
 	LDA 18D9H ;CARGAR PRIMER NUMERO AL ACUMULADOR
 	MOV M,A ;GUARDAR EN MEMORIA
 	INR L ;AUMENTAR POSICION DEL REGISTRO PAR HL
 A1:  ;A1 = 18DAH + 18DEH   SE GENERA UN CARRY: C1
-	LDA 18DAH ;CARGAR VALOR AL ACUMULADOR, ESTE NUMERO ES NECESARIO PARA CALCULAR EL DIGITO A1
+	LDA 18DaH ;CARGAR VALOR AL ACUMULADOR, ESTE NUMERO ES NECESARIO PARA CALCULAR EL DIGITO A1
 	MOV M,A ;MOVER A MEMORIA
 	LDA 18DEH ;CARGAR VALOR AL ACUMULADOR
 	ADD M ;SUMAR ACUMULADOR CON EL CONTENIDO DE LA MEMORIA
@@ -797,7 +797,7 @@ SP2:	;SEPARAR EN BITS
 	LDA 07F9H ; CARGAR EL VALOR AUXILIAR PARA COMPARAR CON B
 	CMP B  ;SI B == 07H ENTONCES SALTA A A7
 	JZ A7
-	LDA 07FAH ; CARGAR EL VALOR AUXILIAR PARA COMPARAR CON B
+	LDA 07FaH ; CARGAR EL VALOR AUXILIAR PARA COMPARAR CON B
 	CMP B  ;SI B == 08H ENTONCES SALTA A A
 	JZ APROX ; SALTAR A SUBRUTINA QUE APROXIMA EL RESULTADO POR TRUNCAMIENTO				
 A2:	; A2 = 18DBH + 18DFH + 18E3H + CARRY_A1
@@ -866,7 +866,7 @@ A5:	; A5 = 18E2H + 18E6H + 18EAH + CARRY_A4
 	ADD M ; SUMAR LO QUE ESTA EN MEMORIA CON EL ACUMULADOR
 	DAA ; AJUSTE DECIMAL
 	MOV M,A  ; MOVER RESULTADO AL REGISTRO M 
-	LDA 18EAH ;CARGAR NUMERO AL ACUMULADOR
+	LDA 18EaH ;CARGAR NUMERO AL ACUMULADOR
 	ADD M ; SUMAR LO QUE ESTA EN MEMORIA CON EL ACUMULADOR
 	DAA ; AJUSTE DECIMAL
 	MOV M,A  ; MOVER RESULTADO AL REGISTRO M 
@@ -939,28 +939,30 @@ TRUNC:
 	MVI A,40H ; MUEVE 40H AL ACUMULADOR, VALOR QUE REPRESNTA EL PUNTO
 	STAX D ; GUARDA EN MEMORIA EL VALOR DEL ACUMULADOR
 	INR E ; INCREMENTA EL REGISTRO E PARA GUARDAR EN LA SIGUIENTE DIRECCION
-	LDA 18AEH ; CARGA EL PRIMERO NUMERO DE LA PARTE DECIMAL		 
+	LDA 18aEH ; CARGA EL PRIMERO NUMERO DE LA PARTE DECIMAL		 
 	STAX D ; GUARDA EN MEMORIA EL CONTENIDO DEL ACUMULADOR
 	INR E  ; INCREMENTA EL REGISTRO E PARA GUARDAR EN LA SIGUIENTE DIRECCION
-	LDA 18ADH ; CARGA EL SEGUNDO NUMERO DE LA PARTE DECIMAL	
+	LDA 18aDH ; CARGA EL SEGUNDO NUMERO DE LA PARTE DECIMAL	
 	STAX D ; GUARDA EN MEMORIA EL CONTENIDO DEL ACUMULADOR
 	INR C  ; INCREMENTAR CANTIDAD DE CARACTERES QUE CONFORMAN EL RESULTADO
     INR C  ; INCREMENTAR CANTIDAD DE CARACTERES QUE CONFORMAN EL RESULTADO
 	INR C    ; INCREMENTAR CANTIDAD DE CARACTERES QUE CONFORMAN EL RESULTADO
 	MOV A,C ; MOVER AL ACUMULADOR EL VALOR DE C
 	STA 1873H ; GUARDAR EN MEMORIA EL VALOR DEL ACUMULADOR
+    MVI A, 99H
+    STA FFFFH
 	RET
 
 ;------- Parte del MainMult -------
 ;Guarda la posicion donde se tendra la direccion donde estara el digito que se multiplicara
-.DATA 18A3H
-DB 18,9BH,18H,9FH
+.DATA 18a3H
+DB 18H,9BH,18H,9FH
 
-.DATA 18A7H ;Contadores del multiplicando y multiplicador respectivamente
+.DATA 18a7H ;Contadores del multiplicando y multiplicador respectivamente
 DB 04H,04H
 
 ;Direccion donde sera guardado el resulta de la multiplicacion separado en digitos
-.DATA 18A9H
+.DATA 18a9H
 DB 18H,ABH
 
 ;Tabla auxiliar para la conversion de binario a decimal
