@@ -468,8 +468,7 @@ FIVE_D: ; En este caso no se realiza ajuste solo se guarda el numero completo pa
 ;---------- Termina ADJUST----------
 
 
-O_D:
-	RET
+;------ Empieza multiplicacion------
 
 MULTIPLY:
 
@@ -477,7 +476,8 @@ MULTIPLY:
     CALL MAIN_MULT
     CALL INITIAL_POINT
     CALL INIT_
-        RET
+	RET
+	
 
 PREPARE_MULT:
     LDA 1895H
@@ -949,9 +949,9 @@ TRUNC:
 	INR C    ; INCREMENTAR CANTIDAD DE CARACTERES QUE CONFORMAN EL RESULTADO
 	MOV A,C ; MOVER AL ACUMULADOR EL VALOR DE C
 	STA 1873H ; GUARDAR EN MEMORIA EL VALOR DEL ACUMULADOR
-    MVI A, 99H
-    STA FFFFH
 	RET
+
+;------ termina multiplicacion-----
 
 ;------- Parte del MainMult -------
 ;Guarda la posicion donde se tendra la direccion donde estara el digito que se multiplicara
