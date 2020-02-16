@@ -25,8 +25,75 @@ LOOP_MAIN: ; main loop
 	JMP LOOP_MAIN
 
 PROGRAM: ; main program routine
-	;output result of the program
-  	RET
+
+  ; O_D_CALL pedimos introducir el codigo
+  
+  CALL INPUT; ingresar el codigo.
+  LDA 186aH;
+  MOV B,A;
+  LXI H, 1800H;
+
+  MVI D, 00H;
+INCREMENT_D: INR D; D+=1
+  MOV A,D;
+  CMP B; if B == D
+  JZ OUT_LOOP;
+
+  MVI C, 00H;
+  MVI A, 06H;
+INCREMENT_C:  INR C; C+=1
+  CMP C;
+  JZ INCREMENT_D;
+  INR L; incrementar posicion en memoria
+	JMP INCREMENT_C;
+  
+OUT_LOOP: MOV A,M; primer byte del elemento en la tabla
+  STA 1891H; cargamos primer byte del primer operando
+  INR L;
+  MOV A, M;
+  STA 1892H; cargamos segundo byte del primer operando
+
+  INR L;
+  MOV A, M;
+  STA 1893H; cargamos tercer byte del primer operando
+
+  INR L;
+  MOV A, M;
+  STA 1894H; cargamos cuarto byte del primer operando
+
+  INR L;
+  MOV A, M;
+  STA 1895H; cargamos quinto byte del primer operando
+
+  ;O_D_CALL pedimos introducir el monto a convertir
+  CALL INPUT; leemos segundo operando (monto a convertir)
+  CALL ADJUST; ajustamos segundo operando (monto a convertir)
+  
+  ;ponemos en posicion el segundo operando (monto a convertir)
+  LXI H, 188CH;
+  MOV A, M;
+  STA 1896H;
+
+  INR L;
+  MOV A,M;
+  STA 1897H;
+
+  INR L;
+  MOV A,M;
+  STA 1898H;
+
+  INR L;
+  MOV A,M;
+  STA 1899H;
+
+  INR L;
+  MOV A,M;
+  STA 189aH;
+
+  CALL MULTIPLY ;multiplicamos
+
+  ;mostramos resultado
+RET_PROGRAM:  RET
 
 R_AND_S_T_R: ; read and save table routine (reads edges of graph)
 	MVI B, 00H; sets register B to 0 pointing to first exchange rate
@@ -47,6 +114,7 @@ A_INIT:	MVI A, 06H; sets register A with upper bound of B (n * n) - n
 RET_R_AND_S_T_R: 	RET
 
 R_EXCHANGE_RATE: ; reads exchange rate pointed by register B
+    ; O_D_CALL pedimos que se ingrese el monto paraa el codigo B
     CALL INPUT
     CALL ADJUST
     CALL SAVE_RATE
@@ -67,7 +135,6 @@ KB_IN: ;keyboard interrupt function
 	JMP E_KEYBOARD_RET; jumps to E_KEYBOARD RET instruction
 
 ;---------- Empieza INPUT ----------
-.ORG 01C3H
 INPUT:
 
 	CALL S_INIT; Se inicia la simulacion
