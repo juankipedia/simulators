@@ -26,7 +26,20 @@ LOOP_MAIN: ; main loop
 
 PROGRAM: ; main program routine
 
-  ; O_D_CALL pedimos introducir el codigo
+  ;PRINT_TO_DISPLAY pedimos introducir el codigo
+  MVI A, 43H; C
+  STA 187CH;
+  MVI A, 4FH; O
+  STA 187DH;
+  MVI A, 44H; D
+  STA 187EH;
+  MVI A, 45H; E
+  STA 187FH;
+  MVI A, 00H; \n
+  STA 1880H;
+  CALL PRINT_ASCII
+  ;termina salida por pantalla
+  
   
   CALL INPUT; ingresar el codigo.
   LDA 186aH;
@@ -65,7 +78,20 @@ OUT_LOOP: MOV A,M; primer byte del elemento en la tabla
   MOV A, M;
   STA 1895H; cargamos quinto byte del primer operando
 
-  ;O_D_CALL pedimos introducir el monto a convertir
+  ;PRINT_TO_DISPLAY pedimos introducir el monto a convertir
+  MVI A, 42H; B
+  STA 187CH;
+  MVI A, 45H; I
+  STA 187DH;
+  MVI A, 4CH; L
+  STA 187EH;
+  MVI A, 4CH; L
+  STA 187FH;
+  MVI A, 00H; \n
+  STA 1880H;
+  CALL PRINT_ASCII
+  ;termina salida por pantalla
+  
   CALL INPUT; leemos segundo operando (monto a convertir)
   CALL ADJUST; ajustamos segundo operando (monto a convertir)
   
@@ -92,7 +118,32 @@ OUT_LOOP: MOV A,M; primer byte del elemento en la tabla
 
   CALL MULTIPLY ;multiplicamos
 
-  ;mostramos resultado
+  ;PRINT_TO_DISPLAY mostramos resultado
+  LDA 1873H; mandamos al registro a la cantidad de digitos
+  MOV D,A;
+  STA 187CH; ya tenemos en el buffer del display la cantidad de digitos.
+  MVI B, 01H; inicializamos el registro B
+  LXI H, 1874H;
+  INR D;
+
+LOOP_PROGRAM_PRINT:  MOV A,D;
+  CMP B;
+  JZ PRINT_RESULT; termino de iterar salimos
+  MOV A,M; cargamos un digito
+  MOV C,A; guardamos el digito
+  INR L;
+  PUSH H; guardamos el registro par HL
+  LXI H, 187CH;
+  MVI A,7CH;
+  ADD B;
+  MOV L,A;
+  MOV M,C;
+  POP H;
+  INR B;
+  JMP LOOP_PROGRAM_PRINT; regresamos en el loop 
+
+PRINT_RESULT: CALL PRINT_NUMBER; imprimimos el resultado
+  ;terminamos de imprimir el resultado
 RET_PROGRAM:  RET
 
 R_AND_S_T_R: ; read and save table routine (reads edges of graph)
@@ -114,7 +165,26 @@ A_INIT:	MVI A, 06H; sets register A with upper bound of B (n * n) - n
 RET_R_AND_S_T_R: 	RET
 
 R_EXCHANGE_RATE: ; reads exchange rate pointed by register B
-    ; O_D_CALL pedimos que se ingrese el monto paraa el codigo B
+    ; PRINT_TO_DISPLAY pedimos que se ingrese el monto paraa el codigo B
+    MVI A, 43H; C
+    STA 187CH;
+    MVI A, 4FH; O
+    STA 187DH;
+    MVI A, 44H; D
+    STA 187EH;
+    MVI A, 45H; E
+    STA 187FH;
+    MVI A, 00H; \n
+    STA 1880H;
+    CALL PRINT_ASCII
+
+    MVI A, 01H;
+    STA 187CH;
+    MOV A,B;
+    STA 187DH;
+    CALL PRINT_NUMBER;
+    ;termina salida por pantalla
+
     CALL INPUT
     CALL ADJUST
     CALL SAVE_RATE
@@ -1019,6 +1089,153 @@ TRUNC:
 	RET
 
 ;------ termina multiplicacion-----
+
+
+
+;------ Output Display ------------
+
+;------------------------- MAIN PROCEDURES --------------------------;
+
+PRINT_ASCII:            CALL NOTIFY_DEVICE
+                        CALL PRINT_BUFFER_ASCII
+                        RET
+
+PRINT_NUMBER:           CALL NOTIFY_DEVICE
+                        CALL PRINT_BUFFER_NUMBER
+                        RET
+
+;---------------------- AUXILIAR PROCEDURES -------------------------;
+
+; ABOUT
+; TELLS DISPLAY CHIP THAT DATA IS GOING TO BE SEND SEQUENTIALLY
+NOTIFY_DEVICE:          LXI H,6800H
+                        MVI M,10010000B
+                        RET
+
+UNSUPPORTED_CHAR:       JMP UNSUPPORTED_CHAR ; UNSUPPORTED CHAR
+
+;-------------- AUXILIAR PROCEDURES FOR PRINT_ASCII -----------------;
+
+PRINT_BUFFER_ASCII:     LXI B,0000H ; BC HOLDS THE ITERATOR
+
+TRY_BUFFER_ASCII:       LXI H,187CH
+                        DAD B
+                        MOV A,M ; LOADS ITH CHAR FROM BUFFER
+
+                        CPI 00H ; CHAR IS END OF STRING?
+                        JZ END_TRY_BUFFER_ASCII ; DONE
+
+                        CALL PRINT_CHAR
+                        
+                        INX B ; INCREMENTS ITERATOR
+                        MOV A,C ; MOVES LOW(ITERATOR) TO A
+
+                        CPI 10H ; REACHED END OF BUFFER?
+                        JZ END_TRY_BUFFER_ASCII ; DONE
+
+                        JMP TRY_BUFFER_ASCII ; REPEAT
+
+END_TRY_BUFFER_ASCII:                    RET
+
+; ABOUT
+; A HOLDS CHAR
+; BC MUST BE PRESERVED
+PRINT_CHAR:             PUSH B ; BACKS UP BC
+                        LXI B,0000H ; BC HOLDS THE ITERATOR
+
+TRY_ASCII:              LXI H,7020H ; LOADS ARRAY ADDRESS
+                        DAD B ; ADDS OFFSET
+                        MOV D,M ; LOADS ITH ASCII VALUE TO D
+
+                        CMP D ; IS THE CHAR REQUESTED?
+                        JZ PRINT_ASCII_CODE ; PRINT CODE WITH OFFSET B
+
+                        INX B ; INCREMENTS ITERATOR
+                        PUSH PSW ; BACKS UP CHAR
+                        MOV A,C ; MOVES LOW ITERATOR TO ACUMULATOR
+
+                        CPI 0EH ; REACHED END OF TABLE?
+                        JZ UNSUPPORTED_CHAR ; PRINT BLANK CHAR
+
+                        POP PSW ; RESTORES CHAR
+                        JMP TRY_ASCII ; REPEAT
+
+; ABOUT
+; EXPECTS OFFSET IN B
+PRINT_ASCII_CODE:       LXI H,7040H
+                        DAD B
+                        MOV A,M 
+                        LXI H,4800H
+                        MOV M,A; SENDS DISPLAY CODE TO 8279
+                        POP B ; RESTORES B
+                        RET
+
+;-------------- AUXILIAR PROCEDURES FOR PRINT_NUMBER ----------------;
+
+PRINT_BUFFER_NUMBER:    LXI H,187CH
+
+                        MVI D,0
+                        MOV E,M ; E HOLDS THE NUMBER LENGTH
+
+                        LXI B,0001H ; BC HOLDS THE ITERATOR
+
+TRY_BUFFER_NUMBER:      LXI H,187CH
+                        DAD B
+                        MOV A,M ; LOADS NUMBER TO A
+
+                        ; IF IT'S EQUAL OR BIGGER THAN 0AH
+                        ; CALL UNSUPPORTED_CHAR
+
+                        PUSH D ; BACKS UP E WITH NUMBER LENGTH
+                        CALL PRINT_DIGIT
+                        POP D ; RESTORES E
+
+                        INX B ; INCREMENTS ITERATOR
+                        MOV A,C ; MOVES LOW(ITERATOR) TO A
+
+                        CMP E ; PROCESSED ALL DIGITS?
+                        JZ END ; DONE
+
+                        CPI 10H ; PROCESSED ALL BUFFER?
+                        JZ END ; DONE
+
+                        JMP TRY_BUFFER_ASCII ; REPEAT
+
+END:                    RET
+
+; ABOUT
+; EXPECTS BUFFER INDEX IN BC, PRESERVE!
+; EXPECTS NUMBER IN A
+PRINT_DIGIT:            
+                        CPI 40H;
+                        JZ END_PRINT_DIGIT;
+                        LXI H,7060H ; TAKES ARRRAY BASE
+                        MOV E,A
+                        DAD D ; ADDS OFFSET
+                        MOV A,M ; LOADS NUMBER
+                        LXI H,4800H ; SETS ADDRESS
+                        MOV M,A ; SENDS 7SEGMENT CODE TO 8279
+END_PRINT_DIGIT:         RET
+
+;--- termina Output Display -------
+
+
+
+;--- parte de Output Display ------
+
+
+;---------------------------- ARRAYS --------------------------------;
+
+.DATA 7020H ; 32 BYTES CONTINOUS IN ROM
+DB 00H, 20H, 41H, 42H, 43H, 44H, 45H, 46H, 47H, 48H, 4AH, 4CH, 4FH, 50H
+
+.DATA 7040H ; 32 BYTES CONTINOUS IN ROM
+DB FFH, FFH, 88H, 08H, 6CH, 0CH, 68H, E8H, 28H, 98H, 0FH, 7CH, 0CH, C8H
+
+.DATA 7060H ; 10 BYTES CONTINOUS IN ROM
+DB 0CH, FCH, 4AH, 0BH, 19H, 29H, 28H, 8FH, 10H, 09H
+
+
 
 ;------- Parte del MainMult -------
 ;Guarda la posicion donde se tendra la direccion donde estara el digito que se multiplicara
