@@ -1143,7 +1143,7 @@ END_TRY_BUFFER_ASCII:                    RET
 PRINT_CHAR:             PUSH B ; BACKS UP BC
                         LXI B,0000H ; BC HOLDS THE ITERATOR
 
-TRY_ASCII:              LXI H,7020H ; LOADS ARRAY ADDRESS
+TRY_ASCII:              LXI H,0720H ; LOADS ARRAY ADDRESS
                         DAD B ; ADDS OFFSET
                         MOV D,M ; LOADS ITH ASCII VALUE TO D
 
@@ -1162,7 +1162,7 @@ TRY_ASCII:              LXI H,7020H ; LOADS ARRAY ADDRESS
 
 ; ABOUT
 ; EXPECTS OFFSET IN B
-PRINT_ASCII_CODE:       LXI H,7040H
+PRINT_ASCII_CODE:       LXI H,0740H
                         DAD B
                         MOV A,M 
                         LXI H,4800H
@@ -1209,7 +1209,7 @@ END:                    RET
 PRINT_DIGIT:            
                         CPI 40H;
                         JZ END_PRINT_DIGIT;
-                        LXI H,7060H ; TAKES ARRRAY BASE
+                        LXI H,0760H ; TAKES ARRRAY BASE
                         MOV E,A
                         DAD D ; ADDS OFFSET
                         MOV A,M ; LOADS NUMBER
@@ -1226,13 +1226,13 @@ END_PRINT_DIGIT:         RET
 
 ;---------------------------- ARRAYS --------------------------------;
 
-.DATA 7020H ; 32 BYTES CONTINOUS IN ROM
+.DATA 0720H ; 32 BYTES CONTINOUS IN ROM
 DB 00H, 20H, 41H, 42H, 43H, 44H, 45H, 46H, 47H, 48H, 4AH, 4CH, 4FH, 50H
 
-.DATA 7040H ; 32 BYTES CONTINOUS IN ROM
+.DATA 0740H ; 32 BYTES CONTINOUS IN ROM
 DB FFH, FFH, 88H, 08H, 6CH, 0CH, 68H, E8H, 28H, 98H, 0FH, 7CH, 0CH, C8H
 
-.DATA 7060H ; 10 BYTES CONTINOUS IN ROM
+.DATA 0760H ; 10 BYTES CONTINOUS IN ROM
 DB 0CH, FCH, 4AH, 0BH, 19H, 29H, 28H, 8FH, 10H, 09H
 
 
