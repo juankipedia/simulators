@@ -1114,118 +1114,118 @@ PRINT_NUMBER:           CALL NOTIFY_DEVICE
                         CALL PRINT_BUFFER_NUMBER
                         RET
 
-;---------------------- AUXILIAR PROCEDURES -------------------------;
-
-; ABOUT
-; TELLS DISPLAY CHIP THAT DATA IS GOING TO BE SEND SEQUENTIALLY
-NOTIFY_DEVICE:          LXI H,6800H
-                        MVI M,10010000B
+NOTIFY_DEVICE:          LXI H, 6800H
+                        MVI M, 10010000B
                         RET
 
-UNSUPPORTED_CHAR:       JMP UNSUPPORTED_CHAR ; UNSUPPORTED CHAR
+IO_ERROR:                  JMP IO_ERROR
+;------------------------ PRINT_ASCII HELPERS -----------------------;
 
-;-------------- AUXILIAR PROCEDURES FOR PRINT_ASCII -----------------;
+PRINT_BUFFER_ASCII:     MVI B, 00H; INDEX = 0
 
-PRINT_BUFFER_ASCII:     LXI B,0000H ; BC HOLDS THE ITERATOR
+ITERATE_BUFFER:         LXI H, 187CH; BUFFER BASE ADDRESSS
+                        MOV A, L
+                        ADD B;
+                        MOV L, A
+                        MOV A, M; A = BUFFER[I]
 
-TRY_BUFFER_ASCII:       LXI H,187CH
-                        DAD B
-                        MOV A,M ; LOADS ITH CHAR FROM BUFFER
+CHECK_END_OF_WORD:      CPI 00H;
+                        JNZ VALID_CHAR
+                        RET
 
-                        CPI 00H ; CHAR IS END OF STRING?
-                        JZ END_TRY_BUFFER_ASCII ; DONE
-
+VALID_CHAR:             PUSH B; BACK UP INDEX
                         CALL PRINT_CHAR
-                        
-                        INX B ; INCREMENTS ITERATOR
-                        MOV A,C ; MOVES LOW(ITERATOR) TO A
+                        POP B; RESTORE INDEX
 
-                        CPI 10H ; REACHED END OF BUFFER?
-                        JZ END_TRY_BUFFER_ASCII ; DONE
-
-                        JMP TRY_BUFFER_ASCII ; REPEAT
-
-END_TRY_BUFFER_ASCII:                    RET
-
-; ABOUT
-; A HOLDS CHAR
-; BC MUST BE PRESERVED
-PRINT_CHAR:             PUSH B ; BACKS UP BC
-                        LXI B,0000H ; BC HOLDS THE ITERATOR
-
-TRY_ASCII:              LXI H,0720H ; LOADS ARRAY ADDRESS
-                        DAD B ; ADDS OFFSET
-                        MOV D,M ; LOADS ITH ASCII VALUE TO D
-
-                        CMP D ; IS THE CHAR REQUESTED?
-                        JZ PRINT_ASCII_CODE ; PRINT CODE WITH OFFSET B
-
-                        INX B ; INCREMENTS ITERATOR
-                        PUSH PSW ; BACKS UP CHAR
-                        MOV A,C ; MOVES LOW ITERATOR TO ACUMULATOR
-
-                        CPI 0EH ; REACHED END OF TABLE?
-                        JZ UNSUPPORTED_CHAR ; PRINT BLANK CHAR
-
-                        POP PSW ; RESTORES CHAR
-                        JMP TRY_ASCII ; REPEAT
-
-; ABOUT
-; EXPECTS OFFSET IN B
-PRINT_ASCII_CODE:       LXI H,0740H
-                        DAD B
-                        MOV A,M 
-                        LXI H,4800H
-                        MOV M,A; SENDS DISPLAY CODE TO 8279
-                        POP B ; RESTORES B
+                        INR B; INDEX++
+                        MOV A, B
+                        CPI 10H; INDEX == 16?
+                        JNZ ITERATE_BUFFER
                         RET
 
-;-------------- AUXILIAR PROCEDURES FOR PRINT_NUMBER ----------------;
+PRINT_CHAR:             MVI B, 00H; INDEX = 0
+                        MOV E, A; E = CHAR
+                        
+ITERATE_ASCII:          MOV A, B;
+                        CPI 0EH; INDEX OVERFLOW?
+                        JZ IO_ERROR;
 
-PRINT_BUFFER_NUMBER:    LXI H,187CH
+READ_ASCII_VALUE:       LXI H, 0720H; ASCII_VALUES ADDRESS
+                        MOV A, L;   
+                        ADD B;
+                        MOV L, A;
+                        MOV A, M; ACC = ASCII_VALUES[I]
 
-                        MVI D,0
-                        MOV E,M ; E HOLDS THE NUMBER LENGTH
+                        CMP E;
+                        JMP PRINT_ASCII_CODE; PRINT ASCII_CODE[B]
 
-                        LXI B,0001H ; BC HOLDS THE ITERATOR
+                        INR B
+                        JMP ITERATE_ASCII
 
-TRY_BUFFER_NUMBER:      LXI H,187CH
-                        DAD B
-                        MOV A,M ; LOADS NUMBER TO A
+PRINT_ASCII_CODE:       LXI H, 0740H;
+                        MOV A, L;
+                        ADD B;
+                        MOV L, A;
+                        MOV A, M; A = ASCII_CODE[B]
+                        LXI H, 4800H;
+                        MOV M, A; SENDS CODE TO DISPLAY CHIP
+                        RET
 
-                        ; IF IT'S EQUAL OR BIGGER THAN 0AH
-                        ; CALL UNSUPPORTED_CHAR
+;------------------------- PRINT NUMBER HELPERS ---------------------;
 
-                        PUSH D ; BACKS UP E WITH NUMBER LENGTH
+PRINT_BUFFER_NUMBER:    LXI H, 187CH
+                        MOV D, M; D = LENGTH
+                        MVI B, 01H; INDEX = 1
+
+ITERATE_NUMBER:         LXI H, 187CH
+                        MOV A, L
+                        ADD B
+                        MOV L, A
+                        MOV A, M; A = BUFFER[I]
+
+SKIP_IF_COMMA:          CPI 40H
+                        JNZ CHECK_SMALL_VALUE
+                        JMP AVOID_LENGTH_OVERFLOW
+
+CHECK_SMALL_VALUE:      MOV E, A; E = DIGIT
+                        MVI A, 0AH;
+                        SUB E; 10 - BUFFER[I]
+                        JZ IO_ERROR
+                        JM IO_ERROR
+
+GET_CODE:               LXI H, 0760H
+                        MOV A, L
+                        ADD E
+                        MOV L, A
+                        MOV E, M; E = CODE
+                        CALL PRINT_NUMBER_CODE
+
+AVOID_LENGTH_OVERFLOW:  MOV A, B
+                        CMP D
+                        JNZ AVOID_BUFFER_OVERFLOW
+                        RET
+
+AVOID_BUFFER_OVERFLOW:  INR B; INDEX++
+                        MOV A, B
+                        CPI 10H
+                        JNZ ITERATE_NUMBER
+                        RET
+
+PRINT_NUMBER_CODE:      MOV A, B
+                        ADI 03H
+                        CMP D
+                        CZ ENFORCE_COMMA
                         CALL PRINT_DIGIT
-                        POP D ; RESTORES E
+                        RET
 
-                        INX B ; INCREMENTS ITERATOR
-                        MOV A,C ; MOVES LOW(ITERATOR) TO A
+ENFORCE_COMMA:          MOV A, E
+                        XRI 00001000B
+                        MOV E, A
+                        RET
 
-                        CMP E ; PROCESSED ALL DIGITS?
-                        JZ END ; DONE
-
-                        CPI 10H ; PROCESSED ALL BUFFER?
-                        JZ END ; DONE
-
-                        JMP TRY_BUFFER_ASCII ; REPEAT
-
-END:                    RET
-
-; ABOUT
-; EXPECTS BUFFER INDEX IN BC, PRESERVE!
-; EXPECTS NUMBER IN A
-PRINT_DIGIT:            
-                        CPI 40H;
-                        JZ END_PRINT_DIGIT;
-                        LXI H,0760H ; TAKES ARRRAY BASE
-                        MOV E,A
-                        DAD D ; ADDS OFFSET
-                        MOV A,M ; LOADS NUMBER
-                        LXI H,4800H ; SETS ADDRESS
-                        MOV M,A ; SENDS 7SEGMENT CODE TO 8279
-END_PRINT_DIGIT:         RET
+PRINT_DIGIT:            LXI H, 4800H
+                        MOV M, E
+                        RET
 
 ;--- termina Output Display -------
 
