@@ -1223,7 +1223,7 @@ ITERATE_ASCII:          MOV A, B;
                         CPI 0EH; INDEX OVERFLOW?
                         JZ IO_ERROR;
 
-READ_ASCII_VALUE:       LXI H, 0720H; ASCII_VALUES ADDRESS
+READ_ASCII_VALUE:       LXI H, 0750H; ASCII_VALUES ADDRESS
                         MOV A, L;   
                         ADD B;
                         MOV L, A;
@@ -1235,7 +1235,7 @@ READ_ASCII_VALUE:       LXI H, 0720H; ASCII_VALUES ADDRESS
                         INR B
                         JMP ITERATE_ASCII
 
-PRINT_ASCII_CODE:       LXI H, 0740H;
+PRINT_ASCII_CODE:       LXI H, 0760H;
                         MOV A, L;
                         ADD B;
                         MOV L, A;
@@ -1266,7 +1266,7 @@ CHECK_SMALL_VALUE:      MOV E, A; E = DIGIT
                         JZ IO_ERROR
                         JM IO_ERROR
 
-GET_CODE:               LXI H, 0760H
+GET_CODE:               LXI H, 0770H
                         MOV A, L
                         ADD E
                         MOV L, A
@@ -1309,13 +1309,13 @@ PRINT_DIGIT:            LXI H, 4800H
 
 ;---------------------------- ARRAYS --------------------------------;
 
-.DATA 0720H ; 32 BYTES CONTINOUS IN ROM
+.DATA 0750H ; 32 BYTES CONTINOUS IN ROM
 DB 00H, 20H, 41H, 42H, 43H, 44H, 45H, 46H, 47H, 48H, 4AH, 4CH, 4FH, 50H
 
-.DATA 0740H ; 32 BYTES CONTINOUS IN ROM
+.DATA 0760H ; 32 BYTES CONTINOUS IN ROM
 DB FFH, FFH, 88H, 08H, 6CH, 0CH, 68H, E8H, 28H, 98H, 0FH, 7CH, 0CH, C8H
 
-.DATA 0760H ; 10 BYTES CONTINOUS IN ROM
+.DATA 0770H ; 10 BYTES CONTINOUS IN ROM
 DB 0CH, FCH, 4AH, 0BH, 19H, 29H, 28H, 8FH, 10H, 09H
 
 
