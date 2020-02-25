@@ -608,13 +608,86 @@ FIVE_D: ; En este caso no se realiza ajuste solo se guarda el numero completo pa
 ;------ Empieza multiplicacion------
 
 MULTIPLY:
-
+    CALL AUX_STORING
     CALL PREPARE_MULT
     CALL MAIN_MULT
     CALL INITIAL_POINT
     CALL INIT_
-	RET
-	
+	    RET	
+
+AUX_STORING:
+;------- Parte del MainMult -------
+;Guarda la posicion donde se tendra la direccion donde estara el digito que se multiplicara
+    LXI D,18a3H
+    MVI A,18H
+    STAX D
+    INX D
+    MVI A,9BH
+    STAX D
+    INX D
+    MVI A,18H
+    STAX D
+    INX D
+    MVI A,9FH
+    STAX D
+;Contadores del multiplicando y multiplicador respectivamente
+    LXI D,18a7H
+    MVI A,04H
+    STAX D
+    INX D
+    MVI A,04H
+    STAX D
+;Direccion donde sera guardado el resulta de la multiplicacion separado en digitos
+    LXI D,18a9H
+    MVI A,18H
+    STAX D
+    INX D
+    MVI A,ABH
+    STAX D
+;Tabla auxiliar para la conversion de binario a decimal
+    LXI D,18CDH
+    MVI A,00H
+    STAX D
+    INX D
+    MVI A,01H
+    STAX D
+    INX D
+    MVI A,02H
+    STAX D
+    INX D
+    MVI A,04H
+    STAX D
+    INX D
+    MVI A,08H
+    STAX D
+;------- Parte del DigitsMult --------
+;Posicion que referencia a una posicion de la tabla 
+    LXI D,18D5H
+    MVI A,ABH
+    STAX D
+    INX D
+    MVI A,18H
+    STAX D
+;Referencia a la posicion donde se van guardando
+    LXI D,18D7H
+    MVI A,D9H
+    STAX D
+    INX D
+    MVI A,18H
+    STAX D
+;Contador para separar
+    LXI D,18F9H
+    MVI A,01H
+    STAX D
+;Contador interno, Contador externo
+    LXI D,18FEH
+    MVI A,02H
+    STAX D
+    INX D
+    MVI A,03H
+    STAX D
+
+    RET
 
 PREPARE_MULT:
     LDA 1895H
@@ -626,7 +699,7 @@ PREPARE_MULT:
     LDA 1891H
     STA 189EH
 
-    LDA 189AH
+    LDA 189aH
     STA 189FH
     LDA 1899H
     STA 18a0H
@@ -764,7 +837,7 @@ MOV A,M  ;Mueve al acumulador el contenido de la primera posicion
 LHLD 18D7H ;Carga la referencia que contiene la posicion donde voy a comenzar a guardar
 MOV M,A  ;Guarda en memoria el primer elemeto del digito
 
-INIT:
+INIT_m:
     LHLD 18D5H;Carga la referencia donde estan los digitos en memoria
     MOV B,M   ;Carga el el registro B 
     MVI A,03H ;Carga en el registro la cantidad de desplazamientos que se haran para obtener el digito correcto
@@ -794,7 +867,7 @@ INIT:
     LDA 18FEH    ;Carga el contador -- Esta posicion debe cambiar-- Fuera de rango
     DCR A        ;Decrementa en uno el contador
     STA 18FEH    ;Guarda el nuevo valor del contador
-    JP INIT      ;Si aun no es cero Salta a INIT de nuevo
+    JP INIT_m      ;Si aun no es cero Salta a INIT de nuevo
 
     ; Aqui calcula el ultimo digito
     LHLD 18D5H   ;Carga la referencia donde estan los digitos en memoria
