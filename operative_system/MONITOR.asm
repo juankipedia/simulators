@@ -7,8 +7,13 @@ JMP KB_IN; sets 7 point 5 Interrupt Service Routine
 
 .ORG 0040H
 INIT_MAIN: ; inits interrupts and devices
-	LXI SP, 1868H; sets stack pointer memory location 
-	MVI A,04H; prepare the mask to enable 7 poitn 5 interrupt
+	
+    LXI SP, 1869H; sets stack pointer memory location 
+	MVI A, FFH;
+    STA 1828H;
+    STA 1829H;
+
+    MVI A,04H; prepare the mask to enable 7 poitn 5 interrupt
 	SIM; apply the settings RTS masks
 
 ;SET 8 8-bit character display -left entry and decoded scan keyboard n-Key Rollover
@@ -18,10 +23,12 @@ INIT_MAIN: ; inits interrupts and devices
 	
 R_AND_S_T: ; read and save table
 	CALL R_AND_S_T_R; calls read and save table routine
+    CALL STACK_O_C; we ensure that there is not stack overflow
 
 
 LOOP_MAIN: ; main loop
 	CALL PROGRAM; calls main program
+    CALL STACK_O_C; we ensure that there is not stack overflow
 	JMP LOOP_MAIN
 
 PROGRAM: ; main program routine
@@ -203,6 +210,28 @@ D_KEYBOARD:
 KB_IN: ;keyboard interrupt function
 	POP H;
 	JMP E_KEYBOARD_RET; jumps to E_KEYBOARD RET instruction
+
+;---Empiza Stack Over Flow Checker--
+STACK_O_C:
+    ;we save register A because is going to be modifyed
+    STA 1821H;
+
+    ; we check the first flag
+    LDA 1828H
+    CPI FFH; 
+    JNZ STACK_O_ERROR; if the flag is not FFH then a stack overflow error occurs
+    ; we check second flag
+    LDA 1829H
+    CPI FFH; 
+    JNZ STACK_O_ERROR; if the flag is not FFH then a stack overflow error occurs
+
+    LDA 1821H;there is no stack overflow we restore register A
+    RET;
+
+STACK_O_ERROR:
+    JMP STACK_O_ERROR; infinite loop if stack overflow occurs
+
+;--Termina Stack Over Flow Checker--
 
 ;---------- Empieza INPUT ----------
 INPUT:
